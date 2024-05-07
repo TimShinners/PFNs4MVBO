@@ -68,6 +68,9 @@ experiment_results/
 deeptime_experiment_results/
 local_overlap_experiment_results/
 local_regression_experiment_results/
+.Rhistory
+.gitignore
+.DS_Store
 
 # Translations
 *.mo
