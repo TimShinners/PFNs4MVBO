@@ -1,0 +1,72 @@
+<!--
+This is for including Chapter 1.  Notice that it's also good practice to name your chunk.  This will help you debug potential issues as you knit.  The chunk above is called intro and the one below is called chapter1.  Feel free to change the name of the Rmd file as you wish, but don't forget to change it here from chap1.Rmd.
+-->
+
+<!--
+The {#rmd-basics} text after the chapter declaration will allow us to link throughout the document back to the beginning of Chapter 1.  These labels will automatically be generated (if not specified) by changing the spaces to hyphens and capital letters to lowercase.  Look for the reference to this label at the beginning of Chapter 2.
+-->
+
+
+
+
+# Introduction {#introduction}
+
+## Motivation
+
+A significant amount of real-world problems can be posed as the optimization of a black box function. These functions must be optimized iteratively, due to the lack of differentiability and any prior knowledge about the behavior of the function itself. From hyperparameter optimization for machine learning models [@snoek2012practical] to the optimization of a cookie recipe [@cookies], a huge class of problems need to be optimized via sequential experimentation to achieve desired results. Large search spaces and costly functions prevent evaluation at all possible points, so there is a need for sample efficient black box optimization methods.
+
+Bayesian optimization [@bayesoptbook] is an iterative model-based method of black box optimization that is well suited for applications where the black box function is costly to compute. First, a probabilistic machine learning model, a so-called surrogate model, is fit to previous observations to model the black box objective. Second, an acquisition function based on the surrogate model is optimized, effectively balancing exploration and exploitation. In the case of cookie optimization [@cookies], the surrogate model predicts the quality of the cookies, given a specific recipe, and the acquisition function estimates the utility of attempting a proposed recipe, given the results of past attempts.
+
+The choice of surrogate function is important to the performance of the specific BO method. Gaussian Processes have been seen as the ideal choice of surrogate model due to their flexibility, predictive performance, and reliable uncertainty estimates [@bayesoptbook]. However, they do not scale well with higher numbers of observations or features. In addition, they lack flexibility, as their posterior distributions are restricted to normal distributions.
+
+Prior-data fitted networks [@pfns4bo], or PFNs, have been proposed as a new surrogate function. These are pre-trained networks that use in-context learning [@transformersDoInference]. In PFNs4BO [@pfns4bo], PFNs were trained using synthetic data sampled from a Gaussian process prior. In a single forward pass, the trained PFNs were able to observe a test and training data set, then produce outputs that accurately approximate that of its respective prior, at a fraction of the computational expense. 
+
+An important class of black box optimization problems are those involving one or more categorical variables. For example, consider the case of optimizing a cookie recipe [@cookies]. Some variables, like "type of chocolate chip," are categorical, while others, such as amount of sugar or salt, are fully continuous across a defined range. These mixed variable input spaces present difficulties in terms of how to handle categorical variables numerically. 
+
+A variety of methods have been proposed to tackle this problem. [@mcbo] created a framework to implement and benchmark a number of these methods, including CoCaBO [@cocabo], Casmopolitan [@casmopolitan], and BODi [@bodi]. These methods use a Gaussian process for the surrogate function, with a mixture of numerical and categorical kernels that incorporate the mixed types of variables. However, due to the surrogate function being a Gaussian process, they suffer from the same issues as non-categorical Gaussian processes. 
+
+It would be desirable if we could use PFNs in this mixed-variable setting in order to leverage the advantages that were demonstrated in the continuous case with PFNs4BO (@pfns4bo). To this end, we outline our research questions below.
+
+## Research Questions {#researchQuestions}
+
+The overarching research question of this work is as follows:
+
+**Do PFNs offer a good alternative to GPs as surrogate functions in mixed-variable Bayesian optimization?**
+    
+\vspace{\baselineskip}
+
+To answer this question, we formulate the following three sub-questions:
+    
+  1. Do PFNs yield similar performance to GPs as a surrogate function in mixed-variable Bayesian optimization loops?
+
+  1. Can PFN performance improve by using a mixture of priors during the PFN's training?
+
+  1. Are PFNs more computationally efficient than their GP counterparts?
+
+## Contributions
+
+In the pursuit of answering these research questions, the following contributions are laid out in this work:
+
+1. A general method to sample the prior's hyperparameters during the PFN training procedure. This allows for easier adaptation to a wider range of priors, as it does not require manually defined prior distributions over the hyperparameters.
+
+1. The application of Weitzman's overlap [@overlap] to score the similarity in behavior between trained PFNs and their respective priors. 
+
+1. Three fully trained PFNs, each trained on a different prior. In addition, we also study a PFN trained on a mixture of all three priors. 
+
+1. Implementation of code that integrates PFNs into the general MCBO [@mcbo] framework, making them ready to use within a Bayesian optimization method[^1]. 
+
+[^1]: Implementation is planned to be released at https://github.com/TimShinners/PFNs4MVBO
+
+## Structure of This Work
+    
+In the next chapter, we cover relevant background information and related works, discussing Bayesian optimization, mixed variable Bayesian optimization, and PFNs. In section \@ref(methods1), we discuss the procedure used to train new PFNs, and in section \@ref(methods2), we explain our procedure for evaluating and comparing trained PFNs, to figure out which training parameters lead to optimal performance. In section \@ref(experiments), we detail our experimental procedure and present the results. We conclude with a short discussion about the results and potential future works in section \@ref(discussion).
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

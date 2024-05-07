@@ -1,0 +1,196 @@
+
+
+# PFN Development Process {#methods2}
+
+In this section, we discuss the methods used to evaluate different PFN variants. In total, we trained over 100 PFNs with a variety of different training settings. This necessitated a methodology to empirically assess the performance of PFNs and determine which variants performed better than others. We aimed for three PFNs in total, one trained using CoCaBO [@cocabo], one with Casmopolitan [@casmopolitan], and one with BODi [@bodi]. We wanted PFNs that behave similarly to their Prior-Data Generating Models (PDGMs) and perform well in regression and Bayesian optimization settings. We designed an evaluation pipeline that incorporated regression tasks and Bayesian optimization runs, as well as a direct comparison between PFNs and their respective PDGMs using an overlap score, allowing us to evaluate PFN performance across these different areas. 
+
+## Evaluation Procedure {#evalProcedure}
+
+We assess our PFNs by measuring their performance in regression settings, and their performance as part of a BO method. In order to assess the regression capabilities of our PFNs, we composed an evaluation procedure that involved drawing training and test data sets from synthetic functions used to evaluate global optimization procedures, and calculating the test loss across a variety of different scenarios. The MCBO package [@mcbo] includes 52 synthetic functions, along with 5 real-world tasks. We opted to use 8 synthetic functions for this evaluation, chosen to include a balanced mix of smooth functions and lumpy functions with many local minima and maxima. 
+
+For these synthetic tasks, it is possible to control the number of numerical dimensions, the number of categorical dimensions, and the number of categories per categorical dimension. For evaluation, we randomly draw 100 different setups, with different numbers of dimensions and categories for each setup as follows. First, we draw the number of dimensions uniformly at random from between 2 and 18, and then the fraction of categorical dimensions. Finally, the number of categories for each categorical variable is drawn from between 2 and 10. This allowed us to observe how the PFN's performance changed with respect to the dimensionality of the task.
+
+For each function, for each of the 100 different setups, we randomly uniformly drew a set of input points, and calculated their corresponding function values to form a training and test set. We used an increasing number of training points, $[4,9,16,25,36,49,64,81,100,121]$, and $1000$ test points to observe how the PFN's performance changed with respect to the amount of training data. For each trial, we calculated the negative log-likelihood loss and the overlap score (introduced below), averaged across the test points. 
+
+We composed another evaluation procedure to assess each PFN's performance in full BO runs. Each PFN's PDGM hailed from a different BO method. To evaluate a PFN's suitability as a BO surrogate model, we replaced the GP-based surrogate function in the original BO method with a PFN. We used the original setup as provided by the MCBO package, but altered the acquisition function settings to reduce computational costs (see Appendix \@ref(acqOptimTests)). We used the same 8 synthetic functions and procedure for drawing the number of dimensions and categories for a given setup. 
+
+For each synthetic function, for 10 different setups, and for 100 iterations, the PFN-based BO method made a suggestion and observed the result. Prior to the start of each run, the BO method was initialized with ten randomly drawn points. 
+
+
+
+#### Overlap Score 
+
+To evaluate a PFN's ability to imitate the GP variant that was used to derive its PDGM. We are interested in measuring the similarity between the PFN's output probability distribution and that of its PDGM. We did not use KL-divergence because it is not symmetric and not scale-invariant. Thus, we chose to calculate Weitzman's overlap [@overlap] between the two distributions. 
+
+Define $f_1(x)$ and $f_2(x)$ as the probability density functions for two separate distributions. Then:
+
+$$\text{Overlap Score} = \int_{-\infty}^\infty\min\left(\{f_1(x),f_2(x)\}\right)dx$$
+
+[@overlap]. This score ranges from 0 to 1, with 1 indicating that the two distributions are identical. The $\min()$ operator is symmetric, so the score itself is symmetric. It is scale invariant, and the score is easily understandable. Two examples are shown in Figure \@ref(fig:example-overlap), where the area of the red shaded region corresponds to the overlap score between the two illustrated probability distributions. 
+
+```{r example-overlap, fig.cap="Two examples of a comparison between the output of a PFN and its PDGM. In one, the two distributions are not so similar and we see an overlap score of 0.109. In the other, the two distributions are quite similar, so we see an overlap score of 0.881.", echo=FALSE, warning=FALSE, message=FALSE, fig.height=2.5}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+library(gridExtra)
+
+theme <- theme_bw()
+
+data <- read.csv("../data_for_thesis_figures/overlap_example_00.csv") 
+
+data_plt_1 <- data %>%
+  filter(pmax(PFN_1, Normal_1) > 0.0001)
+
+data_plt_2 <- data %>%
+  filter(pmax(PFN_2, Normal_2) > 0.0001)
+
+plot1 <- ggplot(data_plt_2, aes(x = X)) +
+  geom_ribbon(aes(ymin = 0, ymax = PFN_2, fill='PFN Output'), 
+                alpha = 0.99) +
+  geom_ribbon(aes(ymin = 0, ymax = Normal_2, fill='PDGM Output'), 
+               alpha = 0.99) +
+  geom_ribbon(aes(ymin = 0, ymax = pmin(PFN_2, Normal_2), fill='Overlap'), 
+               alpha = 0.99, size=1) +
+  labs(title = '', 
+       x = paste("Shaded Area/Overlap: ", as.character(signif(data$overlap_2[1], 3))), y = "Density") +
+  theme +
+  theme(legend.position = "none")
+
+plot2 <- ggplot(data_plt_1, aes(x = X)) +
+  geom_ribbon(aes(ymin = 0, ymax = PFN_1, fill='PFN'), 
+                alpha = 0.99) +
+  geom_ribbon(aes(ymin = 0, ymax = Normal_1, fill='PDGM'), 
+               alpha = 0.99) +
+  geom_ribbon(aes(ymin = 0, ymax = pmin(PFN_1, Normal_1), fill='Overlap'), 
+               alpha = 0.99, size=1) +
+  labs(title = '', 
+       x = paste("Shaded Area/Overlap: ", as.character(signif(data$overlap_1[1], 3))), y = "Density") +
+  guides(fill = guide_legend(reverse=TRUE)) +
+  theme +
+  theme(legend.title = element_blank()) +
+  theme(legend.position = c(0.83,0.68))
+
+grid.arrange(plot1, plot2, ncol=2, top = 'Examples of Overlap Comparisons') 
+```
+
+To solve an integration problem with a $\min()$ operator, one would usually find the set of points where $f_1(x)$ and $f_2(x)$ intersect, and split the problem into piecewise integrals. However, the output of the PFN takes the form of a Riemann distribution, which made an exact solution difficult to calculate because its density function is piecewise constant. In practice, we chose to approximate this integral by calculating $\min\left(\{f_1(x),f_2(x)\}\right)$ at 10,000 equidistant points, multiplying by the distance between points, and then summing across the values. 
+
+This allowed for a direct comparison between PFNs to see which behaved more like its PDGM. The GP-based PDGMs had high predictive accuracy and performed reliably in regression settings, so it followed that high overlap scores corresponded with desirable PFN behavior. The overlap score was a direct comparison between surrogate functions, but its range of $[0,1]$ meant that it was not particularly sensitive to outliers, unlike the negative log likelihood loss. The overlap score was subject to less noise across different trials, unlike BO runs which were dependent on the initial conditions of each trial. We looked at each PFN's regression and BO performance, to investigate changes in behavior across different different training settings. However, due to the aforementioned reasons, we used each PFN's average overlap score as the main criterion by which to measure its quality.
+
+
+## Evaluation Results {#evalResults}
+
+In this section we discuss the specific settings that were used for each of the PFNs trained on the three different PDGMs. We begin with a short discussion of the parameters that impacted performance, then move on to a description of the specific training settings for each of the three PFNs, as well as the mixed PFN. For a discussion of training techniques that were attempted, but yielded poor PFN performance, we refer the reader to Appendix \@ref(failedpfntrainingideas).
+
+
+Firstly, tuning the PFN's learning rate impacted performance. In PFNs4BO [@pfns4bo], they set the default learning rate to 0.0001. We found that doubling or tripling this value improved PFN overlap scores, but setting it any higher led to much worse performance. 
+
+
+We found the number of training points used to fit the PDGM's hyperparameters, discussed in Section \@ref(trainingProcedure), impacts performance of the resulting PFNs. We plot the number of training points against the average overlap score in Figure \@ref(fig:overlap-vs-no-points) for PFNs trained on CoCaBO's surrogate model. We found that increasing the number of points with the number of dimensions yields best results, and we observed similar results for PFNs trained on the other PDGMs.
+
+
+```{r overlap-vs-no-points, fig.cap="PFN overlap score plotted against the number of points drawn during training. Each point represents one PFN, and the error bars reresent 95% bootstrapped confidence intervals. We include an additional marker (blue) showing results when the value was set to increase with the number of dimensions of the input space.", echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+data <- read.csv("../data_for_thesis_figures/cocabo_n_fake_data.csv") 
+
+data <- data %>%
+  mutate(dims = number_points == -1)
+
+data$number_points <- data$number_points + 31*(data$number_points == -1)
+
+colors <- c("#c55151", "#db5ed1", "#5eb5db", "#51c59d","#4ad43e", "#8f00ff", "#dbaf5e")
+colors <- c("#c55151", "#5eb5db")
+
+ggplot(data, aes(x = number_points, y = mean_overlap)) +
+  geom_errorbar(aes(ymin=lb, ymax=ub, color=dims), width=1) +
+  geom_point(aes(shape=dims, color=dims)) +
+  annotate("segment",  x = 35, xend = 31, y = 0.755, yend = 0.775, color='black', arrow=arrow()) + 
+  annotate("text", x = 40, y = 0.75, label = "Number of points set equal \n to number of dimensions") + 
+  labs(title = 'Overlap vs. Number of Points', 
+       x = "Number of Points", y = "Mean Overlap Score") +
+  theme +
+  theme(legend.position = "none")+
+  scale_color_manual(values=colors) +
+  scale_fill_manual(values=colors)
+
+```
+
+We also found that the PFNs tended to yield higher uncertainties than their PDGMs, meaning that a PFN's posterior distribution tended to have a greater variance than that of its PDGM. Observational noise was one of the PDGM's tunable hyperparameters, so during training, we attempted to alter that noise with a multiplier $m\in[0,1]$. This made the data sets sampled from the PDGM less noisy, which would in turn prevent the PFN form over-estimating its uncertainty. We found that adjusting the multiplier $m$ improved PFN performance. In Figure \@ref(fig:overlap-vs-noise-coef), we plotted the noise multiplier against the resulting PFN's average overlap score, for a set of PFNs trained on the Casmopolitan [@casmopolitan] PDGM. In this case, the best results were found with $m=0.7$. 
+
+```{r overlap-vs-noise-coef, fig.cap="Casmopolitan-trained PFN overlap scores against the multiplier for the observational noise coefficient, with 95% confidence intervals. We did not conduct such a wide search for CoCaBO- and BODi-trained PFNs, so they are omitted from this plot.", warning=FALSE, echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+data <- read.csv("../data_for_thesis_figures/casmopolitan_noise_coef.csv") 
+
+ggplot(data, aes(x = noise_coef, y = mean_overlap)) +
+  geom_errorbar(aes(ymin=lb, ymax=ub), width=0.005) +
+  geom_point() +
+  geom_line() +
+  labs(title = 'Overlap vs. Noise Multipliers', 
+       x = "Noise Multiplier", y = "Mean Overlap Score") +
+  theme +
+  theme(legend.position = "none")
+
+```
+
+We now discuss the training parameters that produced the best PFNs for each of the three PDGMs. The average overlap scores, as well as the specific training parameters that produced each of these PFNs are shown in Table \@ref(tab:evalTrainingSettings). Points were drawn from a normal distribution for the PDGM fitting step for the CoCaBO- and Casmopolitan-trained PFNs. For the CoCaBO- and BODi-trained PFNs, the number of points to be drawn was set to the number of dimensions of the input space. For the Casmopolitan-trained PFN, this number was set to 20. Interestingly, for the BODi-trained PFNs, we found best results when using the cosine function to generate data for the PDGM fitting step (for a full explanation on this, see Appendix \@ref(failedpfntrainingideas)). It was notably more difficult to train the BODi-trained PFNs to an acceptable level of performance. Most of the BODi-trained PFNs obtained a mean overlap score of around 0.6, while the best (and only to surpass 0.7) scored 0.771. When we attempted to train another PFN under the same settings, the average overlap score went back into the 0.6's, indicating that the best BODi-trained PFN may have been an anomaly.  
+
+
+```{r evalTrainingSettings, echo=FALSE, warning=FALSE}
+
+df2 <- data.frame(
+  PFN = c("PFN-CoCaBO", "PFN-Casmopolitan", "PFN-BODi"),
+  `Overlap Score` = c(0.787, 0.812, 0.771),
+  `Learning Rate` = c(0.0003, 0.0002, 0.0003),
+  `PDGM Noise Multiplier` = c(0.5, 0.7, 1.0)
+)
+
+knitr::kable(
+  df2,
+  col.names = gsub("\\.", " ", names(df2)),
+  caption="The training settings that produced the best PFNs for each PDGM, as well as their overlap scores."
+)
+```
+
+
+#### Mixed PFNs {#mixedPFNEvalResults}
+
+Next, we discuss the results of the mixed PFN evaluation procedure. Given that the mixed PFNs were not trained on one specific PDGM, there was no reference with which to calculate the overlap score. Thus, we relied on regression performance to compare the different mixed-PDGM PFNs. In total, 7 were trained, each with different probabilities applied to the three different PDGMs. We discuss the decision process of selecting one for further experimentation below.
+
+```{r mixed-pfn-eval-regression, fig.cap="Mixed PFNs ranked by negative log likelihood loss in regression tasks, with 95% confidence intervals. For each of the seven mixed-prior PFNs, we report the probabilities used to select different PDGMs in the form [CoCaBO, Casmopolitan, BODi]", warning=FALSE, echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+
+colors <- c("#c55151", "#db5ed1", "#5eb5db", "#51c59d","#4ad43e", "#8f00ff", "#dbaf5e")
+
+data <- read.csv("../data_for_thesis_figures/mixed_eval_regression_ranking.csv") 
+data$pfn_number <- as.character(data$pfn_number+1)
+data <- data %>%
+  mutate(pfn_number = case_when(
+    grepl("1", pfn_number) ~ "1 [0.33, 0.33, 0.34]",
+    grepl("2", pfn_number) ~ "2 [0.1,  0.5,  0.4]",
+    grepl("3", pfn_number) ~ "3 [0.4,  0.2,  0.4]",
+    grepl("4", pfn_number) ~ "4 [0.2,  0.4,  0.4]",
+    grepl("5", pfn_number) ~ "5 [0.25, 0.5,  0.25",
+    grepl("6", pfn_number) ~ "6 [0.5,  0.25, 0.25]",
+    grepl("7", pfn_number) ~ "7 [0.4,  0.4,  0.2]")) 
+
+ggplot(data, aes(x = n_training_data, y = mean_rank, color=pfn_number)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=pfn_number), 
+               alpha = 0.2, size=0) +
+  geom_line() +
+  labs(title = 'Mixed PFN Ranking in Regression Tasks', 
+       x = "Number of Training Data", y = "Average Rank") + 
+  labs(color = "PFN", fill = 'PFN') +
+  scale_color_manual(values=colors) +
+  scale_fill_manual(values=colors)+
+  theme 
+
+```
+
+Figure \@ref(fig:mixed-pfn-eval-regression) shows ranking plots for the differed mixed PFNs in regression tasks. The rankings are with respect to the negative log-likelihood loss. For each setup where a PFN was given a training and test set, and made to make predictions, the negative log-likelihood was calculated and averaged across all test points. Then, this loss was used to calculate rankings across each of the PFNs. These ranks were then averaged across all scenarios with a given amount of training data, which is shown in the plot. The 6th PFN that we trained is clearly superior to the others in regression tasks. This PFN was trained on a mixture where CoCaBO had a probability of 0.5, Casmopolitan had a probability of 0.25, and BODi had a probability of 0.25. 
+

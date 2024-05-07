@@ -1,0 +1,547 @@
+,optimizer_name,task_name,n_training_data,mean_rank,lb,ub
+4,cocabo,schwefel,4.0,4.76,4.3397499999999996,5.19025
+9,cocabo,schwefel,9.0,5.18,4.769749999999999,5.55
+16,cocabo,schwefel,16.0,5.67,5.37,5.96
+25,cocabo,schwefel,25.0,5.33,4.95,5.68
+36,cocabo,schwefel,36.0,5.06,4.65,5.43
+49,cocabo,schwefel,49.0,4.69,4.27975,5.08
+64,cocabo,schwefel,64.0,4.86,4.48975,5.21
+81,cocabo,schwefel,81.0,4.18,3.79975,4.58
+100,cocabo,schwefel,100.0,3.77,3.31,4.17
+121,cocabo,schwefel,121.0,3.69,3.31,4.11
+144,cocabo,schwefel,144.0,3.42,3.02975,3.81
+169,cocabo,schwefel,169.0,3.03,2.66975,3.4
+196,cocabo,schwefel,196.0,3.1,2.72975,3.51
+4,casmopolitan,schwefel,4.0,5.01,4.57975,5.41025
+9,casmopolitan,schwefel,9.0,5.29,4.87975,5.680249999999999
+16,casmopolitan,schwefel,16.0,4.92,4.51,5.33
+25,casmopolitan,schwefel,25.0,5.03,4.66,5.36
+36,casmopolitan,schwefel,36.0,4.67,4.28,5.05
+49,casmopolitan,schwefel,49.0,4.62,4.23,5.0
+64,casmopolitan,schwefel,64.0,4.53,4.16,4.89
+81,casmopolitan,schwefel,81.0,4.05,3.67,4.43
+100,casmopolitan,schwefel,100.0,4.11,3.7,4.48025
+121,casmopolitan,schwefel,121.0,3.6,3.20975,4.0
+144,casmopolitan,schwefel,144.0,3.72,3.35975,4.05
+169,casmopolitan,schwefel,169.0,3.46,3.11,3.81
+196,casmopolitan,schwefel,196.0,3.25,2.92,3.5902499999999997
+4,bodi,schwefel,4.0,4.19,3.74975,4.66025
+9,bodi,schwefel,9.0,4.79,4.43,5.17
+16,bodi,schwefel,16.0,5.37,5.03,5.65
+25,bodi,schwefel,25.0,5.19,4.83,5.54
+36,bodi,schwefel,36.0,5.69,5.36,5.96
+49,bodi,schwefel,49.0,5.34,4.98,5.69
+64,bodi,schwefel,64.0,5.28,4.91,5.6202499999999995
+81,bodi,schwefel,81.0,5.07,4.7,5.42
+100,bodi,schwefel,100.0,5.08,4.74975,5.43
+121,bodi,schwefel,121.0,4.72,4.37,5.07
+144,bodi,schwefel,144.0,4.22,3.8697500000000002,4.57
+169,bodi,schwefel,169.0,4.41,4.06975,4.78
+196,bodi,schwefel,196.0,4.21,3.84,4.59
+4,dummy_baseline,schwefel,4.0,3.23,2.97,3.49
+9,dummy_baseline,schwefel,9.0,3.0,2.73,3.29
+16,dummy_baseline,schwefel,16.0,3.38,3.1,3.66
+25,dummy_baseline,schwefel,25.0,4.02,3.7,4.3
+36,dummy_baseline,schwefel,36.0,4.53,4.23,4.7902499999999995
+49,dummy_baseline,schwefel,49.0,5.11,4.84,5.4
+64,dummy_baseline,schwefel,64.0,5.51,5.26,5.77
+81,dummy_baseline,schwefel,81.0,5.91,5.62,6.17
+100,dummy_baseline,schwefel,100.0,6.16,5.94,6.36
+121,dummy_baseline,schwefel,121.0,6.38,6.18,6.58
+144,dummy_baseline,schwefel,144.0,6.51,6.31,6.69
+169,dummy_baseline,schwefel,169.0,6.62,6.43,6.77
+196,dummy_baseline,schwefel,196.0,6.66,6.48,6.8
+4,pfn_cocabo_51,schwefel,4.0,3.63,3.3,3.97
+9,pfn_cocabo_51,schwefel,9.0,3.12,2.82975,3.42
+16,pfn_cocabo_51,schwefel,16.0,2.49,2.23,2.76
+25,pfn_cocabo_51,schwefel,25.0,2.64,2.36,2.94025
+36,pfn_cocabo_51,schwefel,36.0,2.32,2.06975,2.57
+49,pfn_cocabo_51,schwefel,49.0,2.26,2.06,2.48
+64,pfn_cocabo_51,schwefel,64.0,1.91,1.71,2.11
+81,pfn_cocabo_51,schwefel,81.0,2.33,2.13,2.54
+100,pfn_cocabo_51,schwefel,100.0,2.33,2.14,2.53
+121,pfn_cocabo_51,schwefel,121.0,2.66,2.44,2.9002499999999998
+144,pfn_cocabo_51,schwefel,144.0,2.77,2.52,3.02
+169,pfn_cocabo_51,schwefel,169.0,2.88,2.66,3.10025
+196,pfn_cocabo_51,schwefel,196.0,2.99,2.74,3.23
+4,pfn_casmopolitan_16,schwefel,4.0,3.17,2.92,3.44025
+9,pfn_casmopolitan_16,schwefel,9.0,2.74,2.45,3.0102499999999996
+16,pfn_casmopolitan_16,schwefel,16.0,2.51,2.26,2.75025
+25,pfn_casmopolitan_16,schwefel,25.0,2.47,2.22,2.7
+36,pfn_casmopolitan_16,schwefel,36.0,2.34,2.11,2.61
+49,pfn_casmopolitan_16,schwefel,49.0,2.32,2.1,2.55
+64,pfn_casmopolitan_16,schwefel,64.0,2.19,1.98,2.4
+81,pfn_casmopolitan_16,schwefel,81.0,2.45,2.21,2.72
+100,pfn_casmopolitan_16,schwefel,100.0,2.38,2.15,2.62
+121,pfn_casmopolitan_16,schwefel,121.0,2.5,2.27975,2.7602499999999996
+144,pfn_casmopolitan_16,schwefel,144.0,2.65,2.39,2.9
+169,pfn_casmopolitan_16,schwefel,169.0,2.71,2.43,3.0
+196,pfn_casmopolitan_16,schwefel,196.0,2.81,2.54975,3.1
+4,pfn_bodi_24,schwefel,4.0,4.01,3.65,4.37
+9,pfn_bodi_24,schwefel,9.0,3.88,3.55,4.180249999999999
+16,pfn_bodi_24,schwefel,16.0,3.66,3.39,3.93
+25,pfn_bodi_24,schwefel,25.0,3.32,2.9897500000000004,3.64
+36,pfn_bodi_24,schwefel,36.0,3.39,3.12975,3.6502499999999998
+49,pfn_bodi_24,schwefel,49.0,3.66,3.39,3.92
+64,pfn_bodi_24,schwefel,64.0,3.72,3.52,3.93025
+81,pfn_bodi_24,schwefel,81.0,4.01,3.75,4.28025
+100,pfn_bodi_24,schwefel,100.0,4.17,3.91975,4.4
+121,pfn_bodi_24,schwefel,121.0,4.45,4.19,4.720249999999999
+144,pfn_bodi_24,schwefel,144.0,4.71,4.44,4.96
+169,pfn_bodi_24,schwefel,169.0,4.89,4.64,5.12
+196,pfn_bodi_24,schwefel,196.0,4.98,4.76,5.19
+4,cocabo,michalewicz,4.0,4.66,4.19,5.12
+9,cocabo,michalewicz,9.0,5.27,4.84,5.67
+16,cocabo,michalewicz,16.0,5.12,4.76,5.48
+25,cocabo,michalewicz,25.0,4.54,4.11,4.96
+36,cocabo,michalewicz,36.0,4.53,4.08,4.970249999999999
+49,cocabo,michalewicz,49.0,3.99,3.59,4.36
+64,cocabo,michalewicz,64.0,3.95,3.55,4.37
+81,cocabo,michalewicz,81.0,3.59,3.19,3.97
+100,cocabo,michalewicz,100.0,3.69,3.33,4.11025
+121,cocabo,michalewicz,121.0,3.31,2.9097500000000003,3.71
+144,cocabo,michalewicz,144.0,3.28,2.92,3.66
+169,cocabo,michalewicz,169.0,3.13,2.75,3.5302499999999997
+196,cocabo,michalewicz,196.0,2.82,2.51,3.14
+4,casmopolitan,michalewicz,4.0,4.41,3.94,4.89
+9,casmopolitan,michalewicz,9.0,4.79,4.41975,5.19
+16,casmopolitan,michalewicz,16.0,4.97,4.57,5.38
+25,casmopolitan,michalewicz,25.0,4.64,4.22,5.08
+36,casmopolitan,michalewicz,36.0,4.72,4.31975,5.09
+49,casmopolitan,michalewicz,49.0,3.82,3.43975,4.250249999999999
+64,casmopolitan,michalewicz,64.0,4.16,3.76,4.55
+81,casmopolitan,michalewicz,81.0,3.51,3.12,3.87
+100,casmopolitan,michalewicz,100.0,3.56,3.2397500000000004,3.8802499999999998
+121,casmopolitan,michalewicz,121.0,3.42,3.08,3.79
+144,casmopolitan,michalewicz,144.0,3.53,3.19,3.8705
+169,casmopolitan,michalewicz,169.0,3.23,2.9,3.5502499999999997
+196,casmopolitan,michalewicz,196.0,3.28,2.94,3.65
+4,bodi,michalewicz,4.0,3.83,3.37975,4.28
+9,bodi,michalewicz,9.0,5.12,4.74,5.48
+16,bodi,michalewicz,16.0,5.36,5.03,5.71
+25,bodi,michalewicz,25.0,5.26,4.87,5.67
+36,bodi,michalewicz,36.0,5.34,4.96,5.68
+49,bodi,michalewicz,49.0,5.38,5.05,5.69025
+64,bodi,michalewicz,64.0,5.2,4.85975,5.53
+81,bodi,michalewicz,81.0,4.91,4.55,5.28025
+100,bodi,michalewicz,100.0,5.03,4.66,5.3702499999999995
+121,bodi,michalewicz,121.0,4.48,4.139749999999999,4.78
+144,bodi,michalewicz,144.0,4.49,4.12975,4.84
+169,bodi,michalewicz,169.0,4.2,3.8,4.6
+196,bodi,michalewicz,196.0,4.0,3.65,4.350249999999999
+4,dummy_baseline,michalewicz,4.0,3.21,2.95,3.49
+9,dummy_baseline,michalewicz,9.0,3.28,3.0,3.55
+16,dummy_baseline,michalewicz,16.0,3.61,3.28,3.94025
+25,dummy_baseline,michalewicz,25.0,4.2,3.82975,4.5802499999999995
+36,dummy_baseline,michalewicz,36.0,4.74,4.42,5.08
+49,dummy_baseline,michalewicz,49.0,5.51,5.2197499999999994,5.81
+64,dummy_baseline,michalewicz,64.0,5.51,5.15,5.8302499999999995
+81,dummy_baseline,michalewicz,81.0,5.83,5.46,6.15025
+100,dummy_baseline,michalewicz,100.0,6.03,5.77,6.3
+121,dummy_baseline,michalewicz,121.0,6.35,6.11,6.59
+144,dummy_baseline,michalewicz,144.0,6.45,6.2,6.67
+169,dummy_baseline,michalewicz,169.0,6.49,6.269749999999999,6.69
+196,dummy_baseline,michalewicz,196.0,6.61,6.36,6.810249999999999
+4,pfn_cocabo_51,michalewicz,4.0,3.69,3.36,4.000249999999999
+9,pfn_cocabo_51,michalewicz,9.0,2.8,2.48,3.1102499999999997
+16,pfn_cocabo_51,michalewicz,16.0,2.18,1.95,2.45
+25,pfn_cocabo_51,michalewicz,25.0,2.52,2.25,2.78
+36,pfn_cocabo_51,michalewicz,36.0,2.13,1.92,2.35
+49,pfn_cocabo_51,michalewicz,49.0,2.15,1.9497499999999999,2.39025
+64,pfn_cocabo_51,michalewicz,64.0,2.23,2.04,2.45
+81,pfn_cocabo_51,michalewicz,81.0,2.41,2.21,2.61
+100,pfn_cocabo_51,michalewicz,100.0,2.26,2.06,2.46
+121,pfn_cocabo_51,michalewicz,121.0,2.44,2.23,2.66
+144,pfn_cocabo_51,michalewicz,144.0,2.36,2.17,2.55
+169,pfn_cocabo_51,michalewicz,169.0,2.63,2.43,2.83
+196,pfn_cocabo_51,michalewicz,196.0,2.71,2.51,2.91
+4,pfn_casmopolitan_16,michalewicz,4.0,3.53,3.24975,3.84
+9,pfn_casmopolitan_16,michalewicz,9.0,2.82,2.56,3.1
+16,pfn_casmopolitan_16,michalewicz,16.0,2.8,2.57,3.04
+25,pfn_casmopolitan_16,michalewicz,25.0,2.74,2.5,2.97025
+36,pfn_casmopolitan_16,michalewicz,36.0,2.59,2.37,2.84
+49,pfn_casmopolitan_16,michalewicz,49.0,2.64,2.41975,2.85
+64,pfn_casmopolitan_16,michalewicz,64.0,2.71,2.46,2.97025
+81,pfn_casmopolitan_16,michalewicz,81.0,3.1,2.83,3.35
+100,pfn_casmopolitan_16,michalewicz,100.0,2.72,2.45975,3.0
+121,pfn_casmopolitan_16,michalewicz,121.0,3.11,2.80975,3.4
+144,pfn_casmopolitan_16,michalewicz,144.0,2.83,2.56975,3.08
+169,pfn_casmopolitan_16,michalewicz,169.0,3.08,2.80975,3.38
+196,pfn_casmopolitan_16,michalewicz,196.0,3.14,2.86,3.41
+4,pfn_bodi_24,michalewicz,4.0,4.67,4.34,4.9605
+9,pfn_bodi_24,michalewicz,9.0,3.92,3.64,4.21
+16,pfn_bodi_24,michalewicz,16.0,3.96,3.72,4.21
+25,pfn_bodi_24,michalewicz,25.0,4.1,3.82,4.36
+36,pfn_bodi_24,michalewicz,36.0,3.95,3.68,4.21
+49,pfn_bodi_24,michalewicz,49.0,4.51,4.21,4.81
+64,pfn_bodi_24,michalewicz,64.0,4.24,3.97,4.520249999999999
+81,pfn_bodi_24,michalewicz,81.0,4.65,4.38,4.89
+100,pfn_bodi_24,michalewicz,100.0,4.71,4.46,4.95025
+121,pfn_bodi_24,michalewicz,121.0,4.89,4.63,5.18
+144,pfn_bodi_24,michalewicz,144.0,5.06,4.81,5.2902499999999995
+169,pfn_bodi_24,michalewicz,169.0,5.24,5.01,5.45
+196,pfn_bodi_24,michalewicz,196.0,5.44,5.22975,5.63
+4,cocabo,griewank,4.0,4.18,3.77975,4.640249999999999
+9,cocabo,griewank,9.0,4.91,4.46,5.29
+16,cocabo,griewank,16.0,4.61,4.179749999999999,5.05
+25,cocabo,griewank,25.0,3.85,3.4097500000000003,4.25
+36,cocabo,griewank,36.0,4.03,3.57,4.47
+49,cocabo,griewank,49.0,2.68,2.31,3.0702499999999997
+64,cocabo,griewank,64.0,2.28,1.98975,2.62025
+81,cocabo,griewank,81.0,1.75,1.53,1.99
+100,cocabo,griewank,100.0,1.56,1.4,1.72
+121,cocabo,griewank,121.0,1.53,1.38,1.71
+144,cocabo,griewank,144.0,1.41,1.27975,1.57
+169,cocabo,griewank,169.0,1.51,1.37,1.68
+196,cocabo,griewank,196.0,1.59,1.4,1.79
+4,casmopolitan,griewank,4.0,4.59,4.15,5.010249999999999
+9,casmopolitan,griewank,9.0,4.59,4.14,4.98
+16,casmopolitan,griewank,16.0,4.55,4.14,4.95
+25,casmopolitan,griewank,25.0,4.45,3.98,4.91
+36,casmopolitan,griewank,36.0,3.82,3.44,4.18
+49,casmopolitan,griewank,49.0,3.49,3.13,3.84
+64,casmopolitan,griewank,64.0,3.04,2.72975,3.36
+81,casmopolitan,griewank,81.0,2.89,2.63,3.14025
+100,casmopolitan,griewank,100.0,2.73,2.49,2.99
+121,casmopolitan,griewank,121.0,2.37,2.16975,2.57
+144,casmopolitan,griewank,144.0,2.57,2.3897500000000003,2.75025
+169,casmopolitan,griewank,169.0,2.68,2.4497500000000003,2.89
+196,casmopolitan,griewank,196.0,2.68,2.49,2.87
+4,bodi,griewank,4.0,4.35,3.87,4.7902499999999995
+9,bodi,griewank,9.0,5.14,4.74,5.5
+16,bodi,griewank,16.0,5.04,4.60975,5.43
+25,bodi,griewank,25.0,4.79,4.38,5.15
+36,bodi,griewank,36.0,4.34,3.91,4.79
+49,bodi,griewank,49.0,4.03,3.67,4.39
+64,bodi,griewank,64.0,3.58,3.25,3.94
+81,bodi,griewank,81.0,3.24,2.93975,3.5502499999999997
+100,bodi,griewank,100.0,3.05,2.79,3.29025
+121,bodi,griewank,121.0,2.66,2.47975,2.85
+144,bodi,griewank,144.0,2.62,2.4,2.82
+169,bodi,griewank,169.0,2.56,2.37,2.76
+196,bodi,griewank,196.0,2.39,2.23,2.55
+4,dummy_baseline,griewank,4.0,3.64,3.3697500000000002,3.91
+9,dummy_baseline,griewank,9.0,4.02,3.68975,4.33
+16,dummy_baseline,griewank,16.0,4.61,4.29,4.9
+25,dummy_baseline,griewank,25.0,5.5,5.24,5.75
+36,dummy_baseline,griewank,36.0,5.92,5.71,6.11025
+49,dummy_baseline,griewank,49.0,6.47,6.28,6.65
+64,dummy_baseline,griewank,64.0,6.9,6.84,6.96
+81,dummy_baseline,griewank,81.0,6.95,6.91,6.99
+100,dummy_baseline,griewank,100.0,6.99,6.97,7.0
+121,dummy_baseline,griewank,121.0,7.0,7.0,7.0
+144,dummy_baseline,griewank,144.0,7.0,7.0,7.0
+169,dummy_baseline,griewank,169.0,7.0,7.0,7.0
+196,dummy_baseline,griewank,196.0,7.0,7.0,7.0
+4,pfn_cocabo_51,griewank,4.0,3.43,3.1,3.77
+9,pfn_cocabo_51,griewank,9.0,2.56,2.26,2.8802499999999998
+16,pfn_cocabo_51,griewank,16.0,2.59,2.34,2.89025
+25,pfn_cocabo_51,griewank,25.0,2.43,2.17,2.7
+36,pfn_cocabo_51,griewank,36.0,2.45,2.22,2.68
+49,pfn_cocabo_51,griewank,49.0,2.62,2.38,2.85
+64,pfn_cocabo_51,griewank,64.0,2.62,2.43,2.82
+81,pfn_cocabo_51,griewank,81.0,3.06,2.83,3.28
+100,pfn_cocabo_51,griewank,100.0,3.27,3.06,3.47
+121,pfn_cocabo_51,griewank,121.0,3.62,3.47,3.77025
+144,pfn_cocabo_51,griewank,144.0,3.57,3.4,3.73
+169,pfn_cocabo_51,griewank,169.0,3.51,3.34,3.66
+196,pfn_cocabo_51,griewank,196.0,3.49,3.29,3.67025
+4,pfn_casmopolitan_16,griewank,4.0,3.34,3.04975,3.65
+9,pfn_casmopolitan_16,griewank,9.0,2.75,2.5,3.01
+16,pfn_casmopolitan_16,griewank,16.0,2.67,2.4,2.94
+25,pfn_casmopolitan_16,griewank,25.0,2.83,2.58,3.08
+36,pfn_casmopolitan_16,griewank,36.0,2.92,2.64975,3.20025
+49,pfn_casmopolitan_16,griewank,49.0,3.57,3.31975,3.81
+64,pfn_casmopolitan_16,griewank,64.0,3.96,3.76,4.15
+81,pfn_casmopolitan_16,griewank,81.0,4.37,4.19,4.53025
+100,pfn_casmopolitan_16,griewank,100.0,4.5,4.33,4.65025
+121,pfn_casmopolitan_16,griewank,121.0,4.88,4.78,4.96
+144,pfn_casmopolitan_16,griewank,144.0,4.93,4.82,5.03
+169,pfn_casmopolitan_16,griewank,169.0,4.83,4.68,4.96
+196,pfn_casmopolitan_16,griewank,196.0,4.88,4.77,4.97
+4,pfn_bodi_24,griewank,4.0,4.47,4.14,4.79
+9,pfn_bodi_24,griewank,9.0,4.03,3.75,4.3302499999999995
+16,pfn_bodi_24,griewank,16.0,3.93,3.63,4.19
+25,pfn_bodi_24,griewank,25.0,4.15,3.89,4.4
+36,pfn_bodi_24,griewank,36.0,4.52,4.26,4.77
+49,pfn_bodi_24,griewank,49.0,5.14,4.92,5.350249999999999
+64,pfn_bodi_24,griewank,64.0,5.62,5.47,5.75
+81,pfn_bodi_24,griewank,81.0,5.74,5.59,5.87
+100,pfn_bodi_24,griewank,100.0,5.9,5.8,5.98
+121,pfn_bodi_24,griewank,121.0,5.94,5.87,5.99
+144,pfn_bodi_24,griewank,144.0,5.9,5.83,5.96
+169,pfn_bodi_24,griewank,169.0,5.91,5.83,5.98
+196,pfn_bodi_24,griewank,196.0,5.97,5.92,6.0
+4,cocabo,rosenbrock,4.0,4.61,4.16975,5.08
+9,cocabo,rosenbrock,9.0,4.85,4.40975,5.3
+16,cocabo,rosenbrock,16.0,4.48,4.03,4.9405
+25,cocabo,rosenbrock,25.0,4.4,3.9497500000000003,4.84
+36,cocabo,rosenbrock,36.0,3.07,2.66,3.48
+49,cocabo,rosenbrock,49.0,2.52,2.2,2.85025
+64,cocabo,rosenbrock,64.0,1.97,1.68,2.27025
+81,cocabo,rosenbrock,81.0,1.76,1.56,1.96
+100,cocabo,rosenbrock,100.0,1.76,1.54,1.97
+121,cocabo,rosenbrock,121.0,1.58,1.3997499999999998,1.79
+144,cocabo,rosenbrock,144.0,1.55,1.36,1.76
+169,cocabo,rosenbrock,169.0,1.62,1.44,1.81025
+196,cocabo,rosenbrock,196.0,1.62,1.4497499999999999,1.8
+4,casmopolitan,rosenbrock,4.0,4.49,4.06975,4.91
+9,casmopolitan,rosenbrock,9.0,4.59,4.13,5.03025
+16,casmopolitan,rosenbrock,16.0,4.57,4.15,4.97
+25,casmopolitan,rosenbrock,25.0,3.7,3.29,4.16025
+36,casmopolitan,rosenbrock,36.0,3.4,3.02,3.75
+49,casmopolitan,rosenbrock,49.0,3.15,2.83,3.49
+64,casmopolitan,rosenbrock,64.0,2.78,2.54,3.06
+81,casmopolitan,rosenbrock,81.0,2.49,2.29,2.7
+100,casmopolitan,rosenbrock,100.0,2.5,2.3,2.7
+121,casmopolitan,rosenbrock,121.0,2.5,2.31,2.7
+144,casmopolitan,rosenbrock,144.0,2.41,2.24975,2.57
+169,casmopolitan,rosenbrock,169.0,2.37,2.18,2.55
+196,casmopolitan,rosenbrock,196.0,2.49,2.28975,2.68025
+4,bodi,rosenbrock,4.0,4.82,4.389749999999999,5.24
+9,bodi,rosenbrock,9.0,4.63,4.22975,5.020249999999999
+16,bodi,rosenbrock,16.0,4.75,4.3397499999999996,5.12
+25,bodi,rosenbrock,25.0,4.17,3.74,4.59
+36,bodi,rosenbrock,36.0,4.27,3.85975,4.66
+49,bodi,rosenbrock,49.0,3.3,2.9497500000000003,3.67
+64,bodi,rosenbrock,64.0,3.25,2.97,3.5102499999999996
+81,bodi,rosenbrock,81.0,2.93,2.66,3.19
+100,bodi,rosenbrock,100.0,2.84,2.6,3.07
+121,bodi,rosenbrock,121.0,2.65,2.46,2.84
+144,bodi,rosenbrock,144.0,2.53,2.35,2.7
+169,bodi,rosenbrock,169.0,2.45,2.29,2.61
+196,bodi,rosenbrock,196.0,2.39,2.22,2.56025
+4,dummy_baseline,rosenbrock,4.0,3.56,3.26,3.84
+9,dummy_baseline,rosenbrock,9.0,4.31,4.019749999999999,4.6
+16,dummy_baseline,rosenbrock,16.0,4.83,4.55,5.09
+25,dummy_baseline,rosenbrock,25.0,5.9,5.69,6.11
+36,dummy_baseline,rosenbrock,36.0,6.42,6.26,6.59
+49,dummy_baseline,rosenbrock,49.0,6.82,6.72,6.9
+64,dummy_baseline,rosenbrock,64.0,6.98,6.95,7.0
+81,dummy_baseline,rosenbrock,81.0,7.0,7.0,7.0
+100,dummy_baseline,rosenbrock,100.0,7.0,7.0,7.0
+121,dummy_baseline,rosenbrock,121.0,7.0,7.0,7.0
+144,dummy_baseline,rosenbrock,144.0,7.0,7.0,7.0
+169,dummy_baseline,rosenbrock,169.0,7.0,7.0,7.0
+196,dummy_baseline,rosenbrock,196.0,7.0,7.0,7.0
+4,pfn_cocabo_51,rosenbrock,4.0,3.33,3.0,3.62
+9,pfn_cocabo_51,rosenbrock,9.0,2.79,2.49,3.12
+16,pfn_cocabo_51,rosenbrock,16.0,2.66,2.34,3.0
+25,pfn_cocabo_51,rosenbrock,25.0,2.64,2.36,2.92025
+36,pfn_cocabo_51,rosenbrock,36.0,2.54,2.31,2.78
+49,pfn_cocabo_51,rosenbrock,49.0,2.85,2.6,3.1102499999999997
+64,pfn_cocabo_51,rosenbrock,64.0,2.91,2.67,3.15
+81,pfn_cocabo_51,rosenbrock,81.0,3.24,3.01,3.45
+100,pfn_cocabo_51,rosenbrock,100.0,3.25,3.04,3.47
+121,pfn_cocabo_51,rosenbrock,121.0,3.4,3.24,3.58
+144,pfn_cocabo_51,rosenbrock,144.0,3.59,3.43,3.74
+169,pfn_cocabo_51,rosenbrock,169.0,3.58,3.4,3.73
+196,pfn_cocabo_51,rosenbrock,196.0,3.62,3.41975,3.8
+4,pfn_casmopolitan_16,rosenbrock,4.0,3.15,2.86,3.43
+9,pfn_casmopolitan_16,rosenbrock,9.0,2.89,2.61,3.2
+16,pfn_casmopolitan_16,rosenbrock,16.0,2.74,2.52,2.96
+25,pfn_casmopolitan_16,rosenbrock,25.0,2.95,2.72,3.19
+36,pfn_casmopolitan_16,rosenbrock,36.0,3.46,3.2397500000000004,3.69
+49,pfn_casmopolitan_16,rosenbrock,49.0,3.98,3.77,4.17
+64,pfn_casmopolitan_16,rosenbrock,64.0,4.35,4.2,4.51
+81,pfn_casmopolitan_16,rosenbrock,81.0,4.64,4.5,4.760249999999999
+100,pfn_casmopolitan_16,rosenbrock,100.0,4.69,4.56,4.81
+121,pfn_casmopolitan_16,rosenbrock,121.0,4.89,4.82,4.96
+144,pfn_casmopolitan_16,rosenbrock,144.0,5.01,4.94,5.08
+169,pfn_casmopolitan_16,rosenbrock,169.0,5.02,4.97,5.07
+196,pfn_casmopolitan_16,rosenbrock,196.0,4.94,4.86,5.01
+4,pfn_bodi_24,rosenbrock,4.0,4.04,3.74,4.34
+9,pfn_bodi_24,rosenbrock,9.0,3.94,3.66975,4.23
+16,pfn_bodi_24,rosenbrock,16.0,3.97,3.7,4.23
+25,pfn_bodi_24,rosenbrock,25.0,4.24,3.93,4.55
+36,pfn_bodi_24,rosenbrock,36.0,4.84,4.57,5.08
+49,pfn_bodi_24,rosenbrock,49.0,5.38,5.15,5.58
+64,pfn_bodi_24,rosenbrock,64.0,5.76,5.62,5.87
+81,pfn_bodi_24,rosenbrock,81.0,5.94,5.89,5.99
+100,pfn_bodi_24,rosenbrock,100.0,5.96,5.92,5.99
+121,pfn_bodi_24,rosenbrock,121.0,5.98,5.95,6.0
+144,pfn_bodi_24,rosenbrock,144.0,5.91,5.84,5.97
+169,pfn_bodi_24,rosenbrock,169.0,5.96,5.92,5.99
+196,pfn_bodi_24,rosenbrock,196.0,5.94,5.88,5.99
+4,cocabo,levy,4.0,4.47,4.0,4.91
+9,cocabo,levy,9.0,4.59,4.15975,5.04
+16,cocabo,levy,16.0,4.65,4.1995000000000005,5.07025
+25,cocabo,levy,25.0,4.14,3.66975,4.58
+36,cocabo,levy,36.0,3.63,3.23,4.05
+49,cocabo,levy,49.0,2.84,2.4497500000000003,3.26
+64,cocabo,levy,64.0,2.32,2.02,2.63
+81,cocabo,levy,81.0,2.35,2.01975,2.69
+100,cocabo,levy,100.0,2.07,1.8,2.36
+121,cocabo,levy,121.0,1.96,1.69,2.2802499999999997
+144,cocabo,levy,144.0,1.76,1.52,2.01
+169,cocabo,levy,169.0,1.72,1.52,1.95
+196,cocabo,levy,196.0,1.61,1.4197499999999998,1.81
+4,casmopolitan,levy,4.0,4.66,4.23,5.07
+9,casmopolitan,levy,9.0,4.44,4.0,4.880249999999999
+16,casmopolitan,levy,16.0,4.79,4.41,5.17
+25,casmopolitan,levy,25.0,4.28,3.8497500000000002,4.73
+36,casmopolitan,levy,36.0,3.89,3.52,4.28
+49,casmopolitan,levy,49.0,3.43,3.11,3.8002499999999997
+64,casmopolitan,levy,64.0,3.39,3.06975,3.72
+81,casmopolitan,levy,81.0,2.94,2.65,3.25
+100,casmopolitan,levy,100.0,2.86,2.59,3.15
+121,casmopolitan,levy,121.0,2.47,2.24975,2.70025
+144,casmopolitan,levy,144.0,2.43,2.21,2.63
+169,casmopolitan,levy,169.0,2.61,2.37,2.85
+196,casmopolitan,levy,196.0,2.61,2.42,2.8
+4,bodi,levy,4.0,4.66,4.16,5.1202499999999995
+9,bodi,levy,9.0,5.3,4.92,5.65025
+16,bodi,levy,16.0,5.04,4.69,5.40025
+25,bodi,levy,25.0,4.79,4.4,5.15
+36,bodi,levy,36.0,4.85,4.4697499999999994,5.20025
+49,bodi,levy,49.0,4.32,3.97975,4.68
+64,bodi,levy,64.0,3.99,3.64,4.3302499999999995
+81,bodi,levy,81.0,3.76,3.45,4.0802499999999995
+100,bodi,levy,100.0,3.55,3.29,3.8002499999999997
+121,bodi,levy,121.0,3.43,3.16,3.72
+144,bodi,levy,144.0,3.18,2.96,3.42
+169,bodi,levy,169.0,2.95,2.7397500000000004,3.17
+196,bodi,levy,196.0,2.86,2.62,3.09
+4,dummy_baseline,levy,4.0,3.57,3.32975,3.85
+9,dummy_baseline,levy,9.0,4.02,3.65,4.340249999999999
+16,dummy_baseline,levy,16.0,4.43,4.10975,4.77
+25,dummy_baseline,levy,25.0,5.4,5.12975,5.67
+36,dummy_baseline,levy,36.0,5.97,5.73,6.2
+49,dummy_baseline,levy,49.0,6.46,6.27975,6.630249999999999
+64,dummy_baseline,levy,64.0,6.81,6.70975,6.9
+81,dummy_baseline,levy,81.0,6.88,6.8,6.94
+100,dummy_baseline,levy,100.0,6.97,6.92,7.0
+121,dummy_baseline,levy,121.0,6.97,6.94,7.0
+144,dummy_baseline,levy,144.0,7.0,7.0,7.0
+169,dummy_baseline,levy,169.0,7.0,7.0,7.0
+196,dummy_baseline,levy,196.0,7.0,7.0,7.0
+4,pfn_cocabo_51,levy,4.0,3.15,2.82,3.50025
+9,pfn_cocabo_51,levy,9.0,2.59,2.27,2.91
+16,pfn_cocabo_51,levy,16.0,2.38,2.1,2.66
+25,pfn_cocabo_51,levy,25.0,2.26,1.99975,2.53
+36,pfn_cocabo_51,levy,36.0,2.25,1.98,2.53
+49,pfn_cocabo_51,levy,49.0,2.54,2.27,2.8002499999999997
+64,pfn_cocabo_51,levy,64.0,2.52,2.28,2.76
+81,pfn_cocabo_51,levy,81.0,2.69,2.43,2.93
+100,pfn_cocabo_51,levy,100.0,2.84,2.6,3.10025
+121,pfn_cocabo_51,levy,121.0,3.1,2.87,3.33
+144,pfn_cocabo_51,levy,144.0,3.31,3.09,3.53
+169,pfn_cocabo_51,levy,169.0,3.25,3.05,3.46
+196,pfn_cocabo_51,levy,196.0,3.36,3.15,3.5702499999999997
+4,pfn_casmopolitan_16,levy,4.0,3.18,2.92,3.45025
+9,pfn_casmopolitan_16,levy,9.0,3.04,2.8,3.31
+16,pfn_casmopolitan_16,levy,16.0,2.69,2.42,2.93
+25,pfn_casmopolitan_16,levy,25.0,2.91,2.7,3.13
+36,pfn_casmopolitan_16,levy,36.0,2.87,2.66,3.1
+49,pfn_casmopolitan_16,levy,49.0,3.4,3.1797500000000003,3.6302499999999998
+64,pfn_casmopolitan_16,levy,64.0,3.63,3.38,3.87
+81,pfn_casmopolitan_16,levy,81.0,3.92,3.69,4.14
+100,pfn_casmopolitan_16,levy,100.0,4.07,3.85975,4.28
+121,pfn_casmopolitan_16,levy,121.0,4.36,4.18,4.54
+144,pfn_casmopolitan_16,levy,144.0,4.53,4.35,4.71
+169,pfn_casmopolitan_16,levy,169.0,4.58,4.41,4.74
+196,pfn_casmopolitan_16,levy,196.0,4.68,4.51,4.81
+4,pfn_bodi_24,levy,4.0,4.31,3.9697500000000003,4.630249999999999
+9,pfn_bodi_24,levy,9.0,4.02,3.75975,4.3
+16,pfn_bodi_24,levy,16.0,4.02,3.69,4.29
+25,pfn_bodi_24,levy,25.0,4.22,3.91,4.520249999999999
+36,pfn_bodi_24,levy,36.0,4.54,4.22,4.81
+49,pfn_bodi_24,levy,49.0,5.01,4.7597499999999995,5.25
+64,pfn_bodi_24,levy,64.0,5.34,5.11,5.53
+81,pfn_bodi_24,levy,81.0,5.46,5.23975,5.65
+100,pfn_bodi_24,levy,100.0,5.64,5.44,5.81
+121,pfn_bodi_24,levy,121.0,5.71,5.57,5.83
+144,pfn_bodi_24,levy,144.0,5.79,5.64,5.91
+169,pfn_bodi_24,levy,169.0,5.89,5.79,5.97
+196,pfn_bodi_24,levy,196.0,5.88,5.78,5.96
+4,cocabo,All Tasks,4.0,4.536,4.3379,4.74405
+9,cocabo,All Tasks,9.0,4.96,4.77,5.156
+16,cocabo,All Tasks,16.0,4.906,4.71,5.10405
+25,cocabo,All Tasks,25.0,4.452,4.25795,4.64605
+36,cocabo,All Tasks,36.0,4.064,3.86595,4.248
+49,cocabo,All Tasks,49.0,3.344,3.1418999999999997,3.53205
+64,cocabo,All Tasks,64.0,3.076,2.878,3.256
+81,cocabo,All Tasks,81.0,2.726,2.55995,2.9
+100,cocabo,All Tasks,100.0,2.57,2.4019500000000003,2.73405
+121,cocabo,All Tasks,121.0,2.414,2.25995,2.586
+144,cocabo,All Tasks,144.0,2.284,2.14,2.4381
+169,cocabo,All Tasks,169.0,2.202,2.064,2.3440499999999997
+196,cocabo,All Tasks,196.0,2.148,2.008,2.29005
+4,casmopolitan,All Tasks,4.0,4.632,4.431900000000001,4.83005
+9,casmopolitan,All Tasks,9.0,4.74,4.542,4.9300999999999995
+16,casmopolitan,All Tasks,16.0,4.76,4.57795,4.952
+25,casmopolitan,All Tasks,25.0,4.42,4.2399000000000004,4.6
+36,casmopolitan,All Tasks,36.0,4.1,3.92,4.28
+49,casmopolitan,All Tasks,49.0,3.702,3.54195,3.878
+64,casmopolitan,All Tasks,64.0,3.58,3.43195,3.74005
+81,casmopolitan,All Tasks,81.0,3.176,3.026,3.3280499999999997
+100,casmopolitan,All Tasks,100.0,3.152,3.00995,3.3040999999999996
+121,casmopolitan,All Tasks,121.0,2.872,2.73395,3.01205
+144,casmopolitan,All Tasks,144.0,2.932,2.802,3.0580499999999997
+169,casmopolitan,All Tasks,169.0,2.87,2.742,3.0020499999999997
+196,casmopolitan,All Tasks,196.0,2.862,2.7459,2.98805
+4,bodi,All Tasks,4.0,4.37,4.182,4.58
+9,bodi,All Tasks,9.0,4.996,4.82,5.18205
+16,bodi,All Tasks,16.0,5.112,4.942,5.28005
+25,bodi,All Tasks,25.0,4.84,4.68,5.016
+36,bodi,All Tasks,36.0,4.898,4.72,5.0760499999999995
+49,bodi,All Tasks,49.0,4.474,4.30795,4.6602
+64,bodi,All Tasks,64.0,4.26,4.0939000000000005,4.43805
+81,bodi,All Tasks,81.0,3.982,3.80995,4.138
+100,bodi,All Tasks,100.0,3.91,3.76,4.0661
+121,bodi,All Tasks,121.0,3.588,3.43995,3.726
+144,bodi,All Tasks,144.0,3.408,3.27395,3.55605
+169,bodi,All Tasks,169.0,3.314,3.168,3.4661
+196,bodi,All Tasks,196.0,3.17,3.034,3.318
+4,dummy_baseline,All Tasks,4.0,3.442,3.318,3.57
+9,dummy_baseline,All Tasks,9.0,3.726,3.584,3.87
+16,dummy_baseline,All Tasks,16.0,4.172,4.02995,4.31605
+25,dummy_baseline,All Tasks,25.0,5.004,4.852,5.14605
+36,dummy_baseline,All Tasks,36.0,5.516,5.376,5.652
+49,dummy_baseline,All Tasks,49.0,6.074,5.958,6.18605
+64,dummy_baseline,All Tasks,64.0,6.342,6.2339,6.45205
+81,dummy_baseline,All Tasks,81.0,6.514,6.414,6.608
+100,dummy_baseline,All Tasks,100.0,6.63,6.546,6.70805
+121,dummy_baseline,All Tasks,121.0,6.74,6.674,6.808
+144,dummy_baseline,All Tasks,144.0,6.792,6.72395,6.856
+169,dummy_baseline,All Tasks,169.0,6.822,6.762,6.87805
+196,dummy_baseline,All Tasks,196.0,6.854,6.794,6.904
+4,pfn_cocabo_51,All Tasks,4.0,3.446,3.294,3.586
+9,pfn_cocabo_51,All Tasks,9.0,2.772,2.6279500000000002,2.9200999999999997
+16,pfn_cocabo_51,All Tasks,16.0,2.46,2.33395,2.59205
+25,pfn_cocabo_51,All Tasks,25.0,2.498,2.3819500000000002,2.616
+36,pfn_cocabo_51,All Tasks,36.0,2.338,2.2359,2.446
+49,pfn_cocabo_51,All Tasks,49.0,2.484,2.376,2.598
+64,pfn_cocabo_51,All Tasks,64.0,2.438,2.342,2.5420499999999997
+81,pfn_cocabo_51,All Tasks,81.0,2.746,2.64595,2.846
+100,pfn_cocabo_51,All Tasks,100.0,2.79,2.6839500000000003,2.896
+121,pfn_cocabo_51,All Tasks,121.0,3.044,2.946,3.138
+144,pfn_cocabo_51,All Tasks,144.0,3.12,3.03,3.22205
+169,pfn_cocabo_51,All Tasks,169.0,3.17,3.08,3.272
+196,pfn_cocabo_51,All Tasks,196.0,3.234,3.14,3.3320499999999997
+4,pfn_casmopolitan_16,All Tasks,4.0,3.274,3.14,3.402
+9,pfn_casmopolitan_16,All Tasks,9.0,2.848,2.718,2.972
+16,pfn_casmopolitan_16,All Tasks,16.0,2.682,2.56395,2.792
+25,pfn_casmopolitan_16,All Tasks,25.0,2.78,2.674,2.886
+36,pfn_casmopolitan_16,All Tasks,36.0,2.836,2.716,2.948
+49,pfn_casmopolitan_16,All Tasks,49.0,3.182,3.058,3.2960499999999997
+64,pfn_casmopolitan_16,All Tasks,64.0,3.368,3.24595,3.49005
+81,pfn_casmopolitan_16,All Tasks,81.0,3.696,3.58195,3.8141
+100,pfn_casmopolitan_16,All Tasks,100.0,3.672,3.54595,3.784
+121,pfn_casmopolitan_16,All Tasks,121.0,3.948,3.82395,4.07
+144,pfn_casmopolitan_16,All Tasks,144.0,3.99,3.86395,4.112
+169,pfn_casmopolitan_16,All Tasks,169.0,4.044,3.918,4.172
+196,pfn_casmopolitan_16,All Tasks,196.0,4.09,3.9699500000000003,4.208
+4,pfn_bodi_24,All Tasks,4.0,4.3,4.15195,4.44405
+9,pfn_bodi_24,All Tasks,9.0,3.958,3.8358999999999996,4.08805
+16,pfn_bodi_24,All Tasks,16.0,3.908,3.786,4.0280499999999995
+25,pfn_bodi_24,All Tasks,25.0,4.006,3.86795,4.148
+36,pfn_bodi_24,All Tasks,36.0,4.248,4.114,4.3740499999999995
+49,pfn_bodi_24,All Tasks,49.0,4.74,4.612,4.86805
+64,pfn_bodi_24,All Tasks,64.0,4.936,4.818,5.056
+81,pfn_bodi_24,All Tasks,81.0,5.16,5.044,5.266
+100,pfn_bodi_24,All Tasks,100.0,5.276,5.17,5.37605
+121,pfn_bodi_24,All Tasks,121.0,5.394,5.292,5.498
+144,pfn_bodi_24,All Tasks,144.0,5.474,5.3819,5.562
+169,pfn_bodi_24,All Tasks,169.0,5.578,5.49795,5.65205
+196,pfn_bodi_24,All Tasks,196.0,5.642,5.56795,5.712

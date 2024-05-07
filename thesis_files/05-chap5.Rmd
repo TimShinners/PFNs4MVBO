@@ -1,0 +1,433 @@
+
+```{r, echo=FALSE, warning=FALSE}
+colors <- c("#8f00ff", "#00832c", "#00729c","#CC79A7", "#00c040", "#56B4E9","#606060")
+colors <- c("#606060", "#8f00ff", "#00832c", "#00729c","#CC79A7", "#00a47a", "#56B4E9")
+colors <- c("#606060", "#a54176", "#00832c", "#00729c","#CC79A7", "#3f9f74", "#56B4E9")
+alpha <- 0.2
+pfn_colors <- colors[5:7]
+mixed_pfn_colors <- c(colors, "#8f00ff")
+
+theme <- theme_bw()
+```
+
+
+# Experiments {#experiments}
+
+In this section, we begin with an outline of the experimental procedure used to test the different trained PFNs. Then, we present the results of the experiments, with a discussion of how these results answer the different research questions in Section \@ref(researchQuestions).
+
+## Procedure {#experimentalProcedure}
+
+In this section we describe the experimental procedure used to evaluate the performance of the trained PFNs, compared to that of their respective Prior-Data Generating Models (PDGMs). 
+
+For experiments, one real world task and five synthetic functions were chosen to evaluate the performance of different surrogate functions in regression and BO settings. Like the evaluation procedure in section \@ref(methods2), the five synthetic functions were chosen to include a mixture of behaviors. We illustrate these functions in Figure \@ref(fig:experimentsfuplot), for the setting with one continuous variable and one categorical variable with three categories. The synthetic functions can be defined with any number of numerical and categorical dimensions, making it possible for the task dimensionality to be randomly sampled in the experiments. The real-world task was to optimize XGBoost hyperparameters, which involved four categorical variables and four continuous variables. None of these tasks were used during development described in Section \@ref(methods2). During training, we limited the maximum dimensionality of the PFNs to 18 (following PFNs4BO [@pfns4bo]), so we could not use the rest of the real-world tasks included in the MCBO framework [@mcbo]. 
+
+To evaluate the overlap and regression performances of our trained PFNs, we followed the same procedure as in section \@ref(methods2), except the tasks were switched out with the new ones chosen for our experiments. Due to the large number of function queries per experiment, only the synthetic functions were used in the regression experiments. The XGBoost hyperparameter optimization task took multiple seconds per function call, rendering overlap and regression experiments unfeasible with this task. Since the BO experiments were set to run for 200 iterations, we also added extra regression trials with greater amounts of training data, using all square numbers up to 200. In addition to testing each PFN and its PDGM, we also tested a "dummy" model, which, for all inputs, simply predicted the mean and variance of the training data. This acted as a baseline for comparisons among the other methods. 
+
+For experiments involving full Bayesian optimization runs, for each task, 30 optimization runs were completed, each with a different set of initial conditions. Like \@ref(methods2), for the synthetic tasks, the total number of dimensions was drawn uniformly between 2 and 18. That number was randomly split to define the number of numerical and categorical dimensions. The number of categories in each categorical dimension was uniformly drawn from between 2 and 10. Before the start of each optimization run, ten initial observations were drawn randomly from the input space. After the initial observations, each optimization run lasted for 200 iterations. As a baseline for the BO experiments, we included a random search, which suggested a randomly drawn point at each iteration. We recorded the time taken for each method to record an observation and make a suggestion at each iteration. 
+
+```{r experimentsfuplot, fig.cap="The different synthetic functions used in experiments, with one numerical variable and one categorical variable with three categories.", echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(wesanderson)
+data <- read.csv("../data_for_thesis_figures/experimentSyntheticFunction.csv") 
+data$x_cat <- as.character(data$x_cat)
+
+data <- data %>%
+  mutate(y = y + 10*(task_name=='Griewank' & x_cat=='0') - 0.2*(task_name=='Michalewicz' & x_cat=='0'))
+
+ggplot(data, aes(x=x_cont, y=y, color=x_cat)) +
+  geom_line() +
+  facet_wrap(vars(task_name), scales = "free_y") +
+  theme(legend.position = "none",
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank()) +
+  ggtitle('Synthetic Functions Used In Experiments') +
+  scale_color_manual(values=c("#c55151", "#5eb5db", "#1fa174")) + 
+  theme +
+  theme(legend.position = "none") +
+  xlab('') +
+  ylab('')
+```
+
+
+As was done in Section \@ref(evalProcedure), we altered the acquisition optimizer settings for the BO experiments to reduce computation times. For specific information on these alterations, we refer the reader to Appendix \@ref(acqOptimTests). 
+
+The experiments were conducted on a compute node consisting of 2 Intel Xeon Gold 6240 processors and 8 Nvidia RTX 2800ti GPUs.
+
+## Results {#results}
+
+In this section, we use experimental results to answer the research questions proposed in Section \@ref(researchQuestions). We begin with the first sub-question in Section \@ref(rq1-1), presenting results from the experiments outlined in Section \@ref(experimentalProcedure). We answer the second sub-question in Section \@ref(rq1-2) with an analysis of the mixed-PDGM PFN's experimental performance. We present empirically observed computation costs for each optimizer in Section \@ref(rq1-3), to answer the third sub-question. We conclude the chapter with a discussion of the main research question in Section \@ref(rq1).
+
+### Do PFNs yield similar performance to GPs as a surrogate function in mixed-variable Bayesian optimization loops? {#rq1-1}
+
+In this section we present experimental results, and discuss whether PFNs yield competitive performance with GPs as a surrogate function in mixed-variable Bayesian optimization methods. We present results from the regression experiments, covering the regression performance and overlap scores of each PFN. After that, the results for the BO experiments are presented. 
+
+#### Regression 
+
+Figure \@ref(fig:regression-experiment-rank-plot) shows the average rank of each model, averaged across all tasks and setups. The rankings are calculated with respect to the negative log likelihood loss, but we found the results to be similar when using the mean squared error. In these regression experiments, we found that the PFNs outperform their respective PDGMs for small amounts of training data, roughly less than 50. As the amount of training data increases, the GPs begin to outperform the PFNs. For the Schwefel and Michalewicz functions, the CoCaBO- and Casmopolitan-trained PFNs outperform all of the GP-based models. For examples of PFNs and their PDGMs fitting to individual training data sets, see Appendix \@ref(modelFitExamples).
+
+```{r regression-experiment-rank-plot, fig.cap="Ranks of different models, with respect to negative log likelihood across different objective functions. 95% bootstrapped confidence intervals are illustrated by the shaded regions.", echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+library(gridExtra)
+data <- read.csv("../data_for_thesis_figures/regression_rank_all_tasks.csv") %>%
+  mutate(optimizer = optimizer_name) %>%
+  mutate(optimizer = case_when(
+    grepl("pfn_bodi", optimizer) ~ "PFN-BODi",
+    grepl("pfn_cocabo", optimizer) ~ "PFN-CoCaBO",
+    grepl("pfn_casmopolitan", optimizer) ~ "PFN-Casmopolitan",
+    grepl("bodi", optimizer) ~ "BODi",
+    grepl("cocabo", optimizer) ~ "CoCaBO",
+    grepl("casmopolitan", optimizer) ~ "Casmopolitan",
+    grepl("dummy_baseline", optimizer) ~ "Dummy Baseline")) %>%
+  mutate(task_name = case_when(
+    grepl("All Tasks", task_name) ~ "All Tasks",
+    grepl("griewank", task_name) ~ "Griewank",
+    grepl("levy", task_name) ~ "Levy",
+    grepl("rosenbrock", task_name) ~ "Rosenbrock",
+    grepl("schwefel", task_name) ~ "Schwefel",
+    grepl("michalewicz", task_name) ~ "Michalewicz",
+    grepl("xgboost_opt", task_name) ~ "XGBoost Opt.")) 
+
+
+data$optimizer <- factor(data$optimizer, levels = c("Dummy Baseline",
+                                                             "BODi",
+                                                             "Casmopolitan",
+                                                             "CoCaBO",
+                                                             "PFN-BODi",
+                                                             "PFN-Casmopolitan",
+                                                             "PFN-CoCaBO"))
+
+ggplot(data, aes(x=n_training_data, y=mean_rank, color=optimizer, linetype=optimizer)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer), 
+               alpha = alpha, size=0, color=NA) +
+  geom_line() +
+  facet_wrap(vars(task_name))+
+  labs(title = 'Ranking for Regression Tasks', 
+       x = "Number of Training Data", y = "Average Rank") + 
+  labs(color = "Optimizer", fill = 'Optimizer', linetype='Optimizer') +
+  scale_linetype_manual(values = c(6,6,6,6,1,1,1)) +
+  scale_color_manual(values=colors) +
+  scale_fill_manual(values=colors) +
+  theme
+```
+
+
+#### Overlap
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+data <- read.csv("../data_for_thesis_figures/overlap_scores_per_model.csv") 
+
+pfn_cocabo <- data %>%
+  filter(model_name == 'pfn_cocabo_51')
+
+pfn_casmo <- data %>%
+  filter(model_name == 'pfn_casmopolitan_16')
+
+pfn_bodi <- data %>%
+  filter(model_name == 'pfn_bodi_24')
+
+dummy_cocabo <- data %>%
+  filter(model_name == 'CoCaBO_dummy_baseline')
+dummy_casmo <- data %>%
+  filter(model_name == 'Casmopolitan_dummy_baseline')
+dummy_bodi <- data %>%
+  filter(model_name == 'BODi_dummy_baseline')
+
+```
+
+In our experiments, averaged across all trials, we found the CoCaBO-trained PFN to have an average overlap of `r sprintf("%.3f", round(pfn_cocabo$overlap_mean, digits=3))`, with a 95% confidence interval of $[`r sprintf("%.3f", round(pfn_cocabo$lb, digits=3))`, `r sprintf("%.3f", round(pfn_cocabo$ub, digits=3))`]$. For the Casmopolitan-trained PFN, the average overlap was `r sprintf("%.3f", round(pfn_casmo$overlap_mean, digits=3))`, with a 95% confidence interval of $[`r sprintf("%.3f", round(pfn_casmo$lb, digits=3))`, `r sprintf("%.3f", round(pfn_casmo$ub, digits=3))`]$. For the BODi-trained PFN, the average overlap was `r sprintf("%.3f", round(pfn_bodi$overlap_mean, digits=3))`, with a 95% confidence interval of $[`r sprintf("%.3f", round(pfn_bodi$lb, digits=3))`, `r sprintf("%.3f", round(pfn_bodi$ub, digits=3))`]$. These values are closely aligned with the average overlaps calculated in the evaluation stage, and suggest that our models are adequate at approximating the behavior of their PDGMs.
+
+
+
+```{r overlap-experiment-plot, fig.cap="Overlap with respect to number of dimensions and training data, averaged across all setups, with 95% confidence intervals.", echo=FALSE, warning=FALSE, message=FALSE, fig.width=6, fig.height=3}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+library(gridExtra)
+data <- read.csv("../data_for_thesis_figures/overlap_plots.csv") %>%
+  mutate(optimizer = case_when(
+    grepl("pfn_bodi", optimizer) ~ "PFN-BODi",
+    grepl("pfn_cocabo", optimizer) ~ "PFN-CoCaBO",
+    grepl("pfn_casmopolitan", optimizer) ~ "PFN-Casmopolitan",
+    grepl("BODi_dummy", optimizer) ~ "Dummy-BODi-Baseline",
+    grepl("CoCaBO_dummy", optimizer) ~ "Dummy-CoCaBO-Baseline",
+    grepl("Casmopolitan_dummy", optimizer) ~ "Dummy-Casmopolitan-Baseline")) 
+
+ggplot(data, aes(x=x_val, y=mean_overlap, color=optimizer, linetype=optimizer)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer), 
+               alpha = alpha, size=0, color=NA) +
+  geom_line() +
+  facet_wrap(vars(x_type), scales = "free_x", strip.position = "top") +
+  labs(title = 'Average Overlap vs. Number of Dimensions and Training Data', 
+       x = "", y = "Average Overlap") + 
+  labs(color = "Optimizer", fill = 'Optimizer', linetype='Optimizer')+
+  scale_linetype_manual(values=c(2,2,2,1,1,1)) +
+  scale_color_manual(values=c(pfn_colors, pfn_colors)) +
+  scale_fill_manual(values=c(pfn_colors, pfn_colors))+ 
+  theme 
+
+```
+
+
+Figure \@ref(fig:overlap-experiment-plot) shows the overlap scores of each of the three PFNs, averaged across the number of training data in one plot, and number of dimensions in the other. 95% confidence intervals are shown in the shaded regions. Also included in the plot are the overlap scores achieved by the "dummy model" which predicts the training mean and variance for all test points. The overlap scores of the PFNs tend to decrease slightly with more training data and more dimensions. 
+
+It is noteworthy that the "dummy" model performs better in scenarios with low data and high dimensionality. This corresponds to scenarios with a high expected distance to the nearest training point, meaning that the GPs would suffer from higher epistemic uncertainty. This would lead them to behave similarly to the "dummy" model for large portions of the input space. 
+
+#### BO
+
+We now present and discuss the results of the BO experiments. We begin with a general comparison of all the methods included in the experiments. Then, we will compare the performance of each PFN against its respective GP-based counterpart. 
+
+The rank of each optimizer at each iteration, averaged across all tasks and all setups, is shown in Figure \@ref(fig:bo-rank). As would be expected, the random baseline performs worst. Casmopolitan and the Casmopolitan-trained PFN are both strong contenders, roughly tied for best overall method. 
+
+```{r bo-rank, fig.cap="Ranks of different optimizers with respect to iteration in BO run, averaged across all tasks and all runs. The shaded regions represent the 95% bootstrapped confidence intervals around each point.", warning=FALSE, echo=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+ 
+data <- read.csv("../data_for_thesis_figures/BO_ranking_all_tasks.csv") %>%
+  filter(task == 'All Tasks')
+
+data$optimizer <- factor(data$optimizer, levels = c("Random Baseline",
+                                                             "BODi",
+                                                             "Casmopolitan",
+                                                             "CoCaBO",
+                                                             "PFN-BODi",
+                                                             "PFN-Casmopolitan",
+                                                             "PFN-CoCaBO"))
+
+ggplot(data, aes(x = iteration, y = mean_rank, color=optimizer, linetype=optimizer)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer), 
+               alpha = alpha, size=0, color=NA) +
+  geom_line() +
+  labs(title = 'Average Rank of Optimizers Across 200 BO Iterations', 
+       x = "Iteration", y = "Average Rank") + 
+  labs(color = "Optimizer", fill = 'Optimizer', linetype='Optimizer') +
+  scale_linetype_manual(values = c(6,6,6,6,1,1,1)) +
+  scale_color_manual(values=colors) +
+  scale_fill_manual(values=colors)+ 
+  theme 
+```
+
+
+The ranks in Figure \@ref(fig:bo-rank) are averaged across all of the tasks used in the experiments. The rankings varied considerably from task to task, so conclusions drawn from these experiments may be subject to the specific experimental conditions, specifically the selection of tasks. A discussion on the differences in optimizer performance across tasks, as well as task-specific ranking plots, can be found in Appendix \@ref(appendixBOrank). 
+
+We remark that the Casmopolitan-trained PFN performs best out of all the tested methods in the opening iterations. This aligns with the PFNs' superior performance in regression settings discussed above. For the later iterations, the Casmopolitan-trained PFN shares a similar rank to the Casmopolitan method, and obtains the second-best average rank at the final iteration. Also, the CoCaBO-trained PFN clearly outperforms the original CoCaBO method, suggesting that switching a GP-based surrogate function to a PFN can yield direct improvements to the BO method. The BODI-trained PFN underperformed compared to the original BODi method, but this result is very task dependent, as shown in Figures \@ref(fig:bo-1v1) and \@ref(fig:bo-best-y-diffs). 
+
+
+
+```{r bo-1v1, fig.cap="Proportion of trials where the PFN's best y value is better than that of its PDGM, for a given iteration and task, averaged across the different setups. The shaded regions represent the 95% bootstrapped confidence interval for each point.", warning=FALSE, echo=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+ 
+data <- read.csv("../data_for_thesis_figures/BO_1v1.csv") %>%
+  mutate(task_name = case_when(
+    grepl("All Tasks", task_name) ~ "All Tasks",
+    grepl("griewank", task_name) ~ "Griewank",
+    grepl("levy", task_name) ~ "Levy",
+    grepl("rosenbrock", task_name) ~ "Rosenbrock",
+    grepl("schwefel", task_name) ~ "Schwefel",
+    grepl("michalewicz", task_name) ~ "Michalewicz",
+    grepl("xgboost_opt", task_name) ~ "XGBoost Opt.")) 
+
+
+ggplot(data, aes(x = iteration, y = mean_proportion, color=optimizer)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer), 
+               alpha = alpha, size=0, color=NA) +
+  geom_line() +
+  facet_wrap(vars(task_name)) +
+  geom_hline(yintercept=0.5, linetype=2) +
+  ylim(c(0,1)) +
+  labs(title = 'Average Win Proportion Between PFNs and Their PDGMs', 
+       x = "Iteration", y = "Proportion") + 
+  labs(color = "Optimizer", fill = 'Optimizer') +
+  theme(legend.position = c(0.83,0.12)) +
+  scale_color_manual(values=pfn_colors) +
+  scale_fill_manual(values=pfn_colors) + 
+  theme 
+
+
+data <- data %>%
+  filter(iteration == 200) %>%
+  filter(task_name == "All Tasks")
+
+cocabo_prop <- data %>%
+  filter(optimizer == "PFN-CoCaBO")
+casmo_prop <- data %>%
+  filter(optimizer == "PFN-Casmopolitan")
+bodi_prop <- data %>%
+  filter(optimizer == "PFN-BODi")
+```
+
+We now look more closely at one-on-one comparisons between the PFNs and their respective GP-based methods. For each task and each iteration, we calculated the proportion of trials where the PFN's best obtained value was superior to that of its respective GP-based method. The results are shown in Figure \@ref(fig:bo-1v1). Points greater than 0.5 at a given iteration indicate that, in more than half of the trials, the PFN was ahead of its respective GP-based method. 
+
+At the 200-th and final iteration, the proportion of trials in which the CoCaBO-trained PFN found a better point than its GP-based counterpart was `r sprintf("%.2f", round(cocabo_prop$mean_proportion, digits=2))`, with a 95% confidence interval of $[`r sprintf("%.2f", round(cocabo_prop$lb, digits=2))`, `r sprintf("%.2f", round(cocabo_prop$ub, digits=2))`]$. For the Casmopolitan-trained PFN, this proportion was `r sprintf("%.2f", round(casmo_prop$mean_proportion, digits=2))`, with an interval of $[`r sprintf("%.2f", round(casmo_prop$lb, digits=2))`, `r sprintf("%.2f", round(casmo_prop$ub, digits=2))`]$. For the BODi-trained PFN, this proportion was `r sprintf("%.2f", round(bodi_prop$mean_proportion, digits=2))`, with an interval of $[`r sprintf("%.2f", round(bodi_prop$lb, digits=2))`, `r sprintf("%.2f", round(bodi_prop$ub, digits=2))`]$.
+
+Generally, across all tasks, the proportions remain close to or slightly greater than 0.5, indicating an advantage when using PFNs as the surrogate model. The GP-based methods performed very poorly on the Rosenbrock function, yielding extremely favorable results for the PFN-based methods. The BODi-trained PFN outperforms BODi in most cases, with the XGBoost optimization task being the only function where the BODi-trained PFN performed substantially worse.
+
+We note that the results in Figures \@ref(fig:bo-rank) and \@ref(fig:bo-1v1) need not agree. For example, suppose optimizers A and B are compared across ten trials. In four trials, they have overall ranks 1 and 7, while in the six remaining trials, they have ranks 7 and 6, respectively. The overall average ranks would suggest that optimizer A is superior, while a one-on-one comparison would suggest superiority to optimizer B. To offer another angle of comparison, we investigate the average differences between the best obtained values at each iteration, shown in Figure \@ref(fig:bo-best-y-diffs). 
+
+```{r bo-best-y-diffs, fig.cap="Each optimizer's best obtained value was recorded at each iteration of each trial. We calculated the difference between the best obtained values from each PFN- and respective GP-based method, for each iteration and each task, averaged across all trials. The shaded regions represent the 95% bootstrapped confidence intervals for each point. In the plots, positive values imply the PFN-based method is better than its GP-based counterpart.", warning=FALSE, echo=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+ 
+data <- read.csv("../data_for_thesis_figures/diff_in_best_y.csv") %>%
+  mutate(task = case_when(
+    grepl("All Tasks", task) ~ "All Tasks",
+    grepl("griewank", task) ~ "Griewank",
+    grepl("levy", task) ~ "Levy",
+    grepl("rosenbrock", task) ~ "Rosenbrock",
+    grepl("schwefel", task) ~ "Schwefel",
+    grepl("michalewicz", task) ~ "Michalewicz",
+    grepl("xgboost_opt", task) ~ "XGBoost Opt.")) 
+
+ggplot(data, aes(x = iteration, y = difference, color=optimizer)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer), 
+               alpha = alpha, size=0, color=NA) +
+  geom_line() +
+  labs(title = 'Average Difference Between Optimizers', 
+       x = "Iteration", y = "Difference in Best-y Values ") + 
+  labs(color = "Optimizer: ", fill = 'Optimizer: ')+
+  facet_wrap(vars(task), ncol=3, scales = "free_y")+
+  geom_hline(yintercept=0, linetype=2) +
+  theme(legend.position = "bottom", legend.box = "horizontal") +
+  scale_color_manual(values=pfn_colors) +
+  scale_fill_manual(values=pfn_colors) +
+  theme 
+```
+
+For each task and each iteration, we calculated the difference in best obtained values between each PFN and its GP-based counterpart, averaged across all setups. The results are shown in Figure \@ref(fig:bo-best-y-diffs). Points greater than zero imply that, on average, the best value found by the PFN-based method was better than that of its PDGM. This information is different from that in Figure \@ref(fig:bo-1v1) because, rather than simply counting the "wins" of each method, Figure \@ref(fig:bo-best-y-diffs) takes the magnitude of each "win" into account. We see that, for the most part, the PFNs perform somewhat similarly to their respective GP-based methods. The CoCaBO-trained PFN outperforms CoCaBO in almost every instance, while BODi and Casmopolitan outperform their respective PFN-based methods when optimizing the Schwefel and Michalewicz functions. We note the disagreement between Figures \@ref(fig:bo-1v1) and \@ref(fig:bo-best-y-diffs) on the Rosenbrock function. Figure \@ref(fig:bo-1v1) suggests that the BODI- and Casmopolitan-trained PFNs were superior to their respective PDGMs, but they are shown to be nearly even in Figure \@ref(fig:bo-best-y-diffs). 
+
+Across Figures \@ref(fig:bo-rank), \@ref(fig:bo-1v1), and \@ref(fig:bo-best-y-diffs), there is evidence to suggest that the PFNs' performance in a BO setting is similar, if not better, than that of a GP. Figure \@ref(fig:bo-rank) portrayed the Casmopolitan-trained PFN as a contender for best overall method included in the experiments. In Figure \@ref(fig:bo-best-y-diffs), we found that the best obtained value by PFN-based methods, on average, was superior to that obtained by their respective GP-based methods. Overall, the PFNs display proficiency as a surrogate function that rivals that of their GP-based counterparts. 
+
+### Can PFN performance improve by using a mixture of PDGMs during the PFN's training? {#rq1-2}
+
+We now attempt to determine if the mixed-PDGM PFN yields better performance over the other PFNs. As discussed in Section \@ref(mixedPFNEvalResults), one mixed-PDGM PFN was included in the regression and BO experiments. In this section, we discuss the performance of the mixed-PDGM PFN, and determine whether it yields improved performance over the other methods. For the BO experiments, we needed to choose an acquisition function and acquisition optimizer for the mixed-PDGM PFN. Initial tests showed that the expected improvement and the interleaved search acquisition optimizer provided best results, so this is the configuration that we used for the BO experiments.
+
+In Figures \@ref(fig:mixed-regression-ranks) and \@ref(fig:mixed-bo-ranks), we make one comparison between the mixed-PDGM PFN and the GP-based methods, as well as one comparison between the mixed-PDGM PFN and the other PFNs. 
+
+```{r mixed-regression-ranks, fig.cap="The average rank of the mixed-PDGM PFN plotted against the number of training data, with respect to negative log likelihood loss in a regression setting.", warning=FALSE, echo=FALSE, fig.height=3}
+library(ggplot2)
+library(dplyr)
+ 
+data <- read.csv("../data_for_thesis_figures/regression_mixed_mcbo_ranks.csv")
+
+ggplot(data, aes(x = n_training_data, y = mean_rank, color=optimizer_name, linetype=optimizer_name)) +
+  #geom_errorbar(aes(ymin=lb, ymax=ub), width=1) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer_name), 
+               alpha = alpha, size=0, color=NA) +
+  geom_line() +
+  facet_wrap(vars(comparison)) +
+  labs(title = 'Mixed PFN Average Rank, Regression Tasks', 
+       x = "Number of Training Data", y = "Average Rank") + 
+  labs(color = "Model", fill = 'Model', linetype='Model') +
+  scale_linetype_manual(values = c(6,6,6,1,1,1,1)) +
+  scale_color_manual(values=mixed_pfn_colors[2:8]) +
+  scale_fill_manual(values=mixed_pfn_colors[2:8])+ 
+  theme 
+
+```
+
+The results of the regression experiments, shown in Figure \@ref(fig:mixed-regression-ranks), illustrate that the performance of the mixed-PDGM PFN is similar to the other PFNs when compared to the GP-based models. The mixed-PDGM PFN appears superior for smaller amounts of training data, and inferior when the amount of training data roughly exceeds 50. When compared to the other PFNs, we find that the mixed-PDGM PFN does not exhibit improved performance over the existing PFNs. Specifically, for regression tasks it seems that the CoCaBO-trained PFN remains superior. 
+
+```{r mixed-bo-ranks, fig.cap="The average rank of the mixed-PDGM PFN in full BO runs. 95% bootstrapped confidence intervals are illustrated by the shaded regions.", warning=FALSE, echo=FALSE, fig.height=3}
+library(ggplot2)
+library(dplyr)
+data <- 0345
+data <- read.csv("../data_for_thesis_figures/mixed_BO_ranking.csv") %>%
+  filter(task == 'All Tasks') %>%
+  filter(comparison != 'vs. All') %>%
+  filter(optimizer != "Random Baseline")
+
+ggplot(data, aes(x = iteration, y = mean_rank, color=optimizer, linetype=optimizer)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer), 
+               alpha = alpha, size=0, color=NA) +
+  geom_line() +
+  facet_wrap(vars(comparison), ncol=2, scales = 'free_y') +
+  labs(title = 'Mixed PFN Average Rank, BO Tasks', 
+       x = "Iteration", y = "Average Rank") + 
+  labs(color = "Model", fill = 'Model', linetype='Model') +
+  scale_linetype_manual(values = c(6,6,6,1,1,1,1)) +
+  scale_color_manual(values=mixed_pfn_colors[2:8]) +
+  scale_fill_manual(values=mixed_pfn_colors[2:8])+ 
+  theme 
+```
+
+Figure \@ref(fig:mixed-bo-ranks) shows the average rank of the mixed-PDGM PFN when compared to GP-based methods and the other PFN methods, in the BO experiments. Once again, the mixed-PDGM PFN does not appear superior to the other methods in a meaningful way. There was not a single individual task where the mixed-PDGM PFN exhibited superior performance to the other PFNs, so this result was not particularly dependent on the tasks included in the experiment. We conclude that we were unable to yield improvements by training a PFN on a mixture of PDGMs.
+
+
+### Are PFNs more computationally efficient than their GP counterparts? {#rq1-3}
+
+We now compare computation times between GP- and PFN-based methods. For each iteration of the BO experiments, we recorded the time taken to make one observation and one suggestion. The resulting times, plotted against the number of iterations for each optimizer, is shown in the left half of Figure \@ref(fig:bo-time). The values are averaged across all tasks and all setups, and the 95% confidence intervals are illustrated by the shaded regions. The results show that the PFNs were, for the most part, slower than their GP counterparts. We note the CoCaBO-trained PFN is faster than the other two, this difference is caused by its computationally cheaper acquisition optimizer compared to that of the Casmopolitan- or BODi-trained PFNs.
+
+The results do not fulfill the promise of drastically decreased computation times for PFNs, although it is clear that the computation time per iteration increases more rapidly with the GP-based methods. To investigate this further, we set up another test to see if the GP-based methods would become slower after more observations. For 30 repetitions, each optimizer was given 99 randomly drawn observations, before making one timed observation, and one timed suggestion. For this test, we only used one synthetic black box function, as we were not interested in the optimizers' performance, but the time taken to observe and suggest with different amounts of previous observations. The results of this test are shown in the right half of Figure \@ref(fig:bo-time). 
+
+```{r bo-time, fig.cap="Time taken for an optimizer to make one observation and one suggestion, with 95% confidence intervals.", warning=FALSE, echo=FALSE, fig.height=3}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+ 
+data <- read.csv("../data_for_thesis_figures/BO_time_experiment.csv") %>%
+  filter(iteration > 0)%>%
+  mutate(optimizer = case_when(
+    grepl("pfn_bodi", optimizer) ~ "PFN-BODi",
+    grepl("pfn_cocabo", optimizer) ~ "PFN-CoCaBO",
+    grepl("pfn_casmopolitan", optimizer) ~ "PFN-Casmopolitan",
+    grepl("bodi", optimizer) ~ "BODi",
+    grepl("cocabo", optimizer) ~ "CoCaBO",
+    grepl("casmopolitan", optimizer) ~ "Casmopolitan")) %>%
+  mutate(timescale = "Short BO Runs")
+
+data2 <- read.csv("../data_for_thesis_figures/deeptime_BO_experiment.csv") %>%
+  mutate(optimizer = case_when(
+    grepl("pfn_bodi", optimizer) ~ "PFN-BODi",
+    grepl("pfn_cocabo", optimizer) ~ "PFN-CoCaBO",
+    grepl("pfn_casmopolitan", optimizer) ~ "PFN-Casmopolitan",
+    grepl("bodi", optimizer) ~ "BODi",
+    grepl("cocabo", optimizer) ~ "CoCaBO",
+    grepl("casmopolitan", optimizer) ~ "Casmopolitan")) %>%
+  mutate(timescale = "Long BO Runs")
+
+data <- rbind(data, data2)
+
+data$timescale <- factor(data$timescale, levels = c("Short BO Runs", "Long BO Runs"))
+
+ggplot(data, aes(x = iteration, y = mean_time, color=optimizer, linetype=optimizer)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer), 
+               alpha = alpha, size=0, color=NA) +
+  geom_line() +
+  facet_wrap(vars(timescale), scales = "free") +
+  labs(title = 'Time Per BO Iteration', 
+       x = "Iteration", y = "Time (Seconds)") + 
+  labs(color = "Optimizer", fill = 'Optimizer', linetype='Optimizer') +
+  scale_linetype_manual(values = c(6,6,6,1,1,1)) +
+  scale_color_manual(values=colors[2:7]) +
+  scale_fill_manual(values=colors[2:7])+ 
+  theme 
+
+```
+
+
+
+
+The right half of Figure \@ref(fig:bo-time) illustrates a stark contrast between GP-based methods and PFN-based methods, with the PFN-based methods holding a clear advantage over GP-based methods in terms of computational expense. This distinction only becomes apparent after the 500th iteration, but beyond that, there is a clear advantage to using PFNs as a surrogate function in a BO method, in that the computation time per iteration is magnitudes less than that of a GP surrogate function. 
+
+### Do PFNs offer a good alternative to GPs as surrogate functions in mixed-variable Bayesian optimization? {#rq1}
+
+Our experimental results provide evidence that PFNs offer a good alternative to GPs as the surrogate function in a BO method. In Section \@ref(rq1-1), we found that PFNs perform competitively with their GP-based counterparts. In regression settings, we found PFNs to be superior to GPs for small amounts of training data. We found that our PFNs scored an average overlap of `r sprintf("%.3f", round(pfn_cocabo$overlap_mean, digits=3))`, `r sprintf("%.3f", round(pfn_casmo$overlap_mean, digits=3))`, and `r sprintf("%.3f", round(pfn_bodi$overlap_mean, digits=3))` for the CoCaBO-, Casmopolitan- and BODi-trained PFNs, respectively. This indicates a strong similarity in behavior for each PFN and its respective PDGM. The BO experiments also suggest competitive performance between PFN- and GP-based methods, with the Casmopolitan-trained PFN contending for the best overall method included in the experiments. 
+
+In Section \@ref(rq1-2), we did not find substantial improvements with the mixed-PDGM PFN. It performed worse than the Casmopolitan-trained PFN in almost every setup. 
+
+In Section \@ref(rq1-3), findings showed definitively that PFNs are computationally cheaper than their GP counterparts when the number of previously recorded observations is large. This illustrates a clear advantage for the use of PFNs as a surrogate model over traditional GPs.
+
+Given the competitive performance of PFNs when compared to GPs in BO settings, and their vastly reduced computational expense, we conclude that PFNs do offer a good alternative to GPs as a surrogate model in mixed variable BO methods.
+
+
+
+
+

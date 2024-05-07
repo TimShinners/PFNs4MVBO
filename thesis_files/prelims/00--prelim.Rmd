@@ -1,0 +1,12 @@
+
+
+Hiermit versichere ich, dass ich die vorliegende Masterarbeit selbständig und nur mit den angegebenen Hilfsmitteln angefertigt habe und dass alle Stellen, die dem Wortlaut oder dem Sinne nach anderen Werken entnommen sind, durch Angaben von Quellen als Entlehnung kenntlich gemacht worden sind. Diese Masterarbeit wurde in gleicher oder ähnlicher Form in keinem anderen Studiengang als Prüfungsleistung vorgelegt.
+
+\vspace{2cm}
+
+\begin{tabular}{@{}p{0.5\textwidth}p{0.5\textwidth}@{}}
+  \underline{\quad Tübingen, den \today \quad} & \underline{\hspace{6cm}} \\
+  Ort und Datum & Unterschrift
+\end{tabular}
+
+\newline

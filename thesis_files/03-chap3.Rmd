@@ -1,0 +1,140 @@
+```{r include_packages_2, include = FALSE}
+# This chunk ensures that the thesisdown package is
+# installed and loaded. This thesisdown package includes
+# the template files for the thesis and also two functions
+# used for labeling and referencing
+if (!require(remotes)) {
+  if (params$`Install needed packages for {thesisdown}`) {
+    install.packages("remotes", repos = "https://cran.rstudio.com")
+  } else {
+    stop(
+      paste(
+        'You need to run install.packages("remotes")',
+        "first in the Console."
+      )
+    )
+  }
+}
+if (!require(dplyr)) {
+  if (params$`Install needed packages for {thesisdown}`) {
+    install.packages("dplyr", repos = "https://cran.rstudio.com")
+  } else {
+    stop(
+      paste(
+        'You need to run install.packages("dplyr")',
+        "first in the Console."
+      )
+    )
+  }
+}
+if (!require(ggplot2)) {
+  if (params$`Install needed packages for {thesisdown}`) {
+    install.packages("ggplot2", repos = "https://cran.rstudio.com")
+  } else {
+    stop(
+      paste(
+        'You need to run install.packages("ggplot2")',
+        "first in the Console."
+      )
+    )
+  }
+}
+if (!require(bookdown)) {
+  if (params$`Install needed packages for {thesisdown}`) {
+    install.packages("bookdown", repos = "https://cran.rstudio.com")
+  } else {
+    stop(
+      paste(
+        'You need to run install.packages("bookdown")',
+        "first in the Console."
+      )
+    )
+  }
+}
+if (!require(thesisdown)) {
+  if (params$`Install needed packages for {thesisdown}`) {
+    remotes::install_github("ismayc/thesisdown")
+  } else {
+    stop(
+      paste(
+        "You need to run",
+        'remotes::install_github("ismayc/thesisdown")',
+        "first in the Console."
+      )
+    )
+  }
+}
+library(thesisdown)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+# flights <- read.csv("data/flights.csv", stringsAsFactors = FALSE)
+```
+
+
+# Training Methods {#methods1}
+
+In this section, we discuss the methods and procedures used to train PFNs. We begin with a general overview of the training process, then discuss methods for sampling hyperparameters for the prior-data generating model.
+
+## Training Procedure {#trainingProcedure}
+
+We closely followed the training procedure used in PFNs4BO. When training a new PFN, a Prior-Data Generating Model (PDGM) is selected, and then synthetic data sets are drawn from the PDGM, which are used as training data for the PFN. In this work, we attempted to train new PFNs using the mixed variable surrogate functions from CoCaBO [@cocabo], Casmopolitan [@casmopolitan], and BODi [@bodi] as PDGMs. 
+
+To train a PFN, we must sample data sets from the selected PDGM. If the PDGM is a Gaussian process, then to do this, we draw $n$ values uniformly from the input space. Given these values, the covariance matrix $K$ is calculated, such that $K_{i,j}=k(x_i,x_j)$, with $k(\cdot,\cdot)$ being the GP's covariance function, and $x_i,\ x_j$ being two different points drawn from the input space. Then, $y$ values are sampled from a multivariate normal distribution $y\sim N(\mu=\textbf{0}, \Sigma=K)$. Together, $D=\{(x_i,y_i)|i\in1,...,n\}$ forms one sampled data set. 
+
+When training a PFN, data sets are sampled from the PDGM and partitioned into training and test sets. The training and test sets are passed to the PFN. The cross-entropy loss between the PFN's output and the test $y$ points is calculated and used for backpropagation through the PFN. 
+
+At the start of the training procedure, the boundaries of the PFN's buckets for the Riemann distribution must be selected. First, a large number of $y$ values are drawn from the PDGM. The $y$ values are then sorted into 1000 buckets of equal population, so regions with a high density of $y$ values have smaller buckets. The boundaries of these buckets remain constant for the duration of the training procedure. 
+
+#### Hyperparameters For The Prior-Data Generating Model
+
+All three of the PDGMs used in this work are GPs that employ a mixture of a Matern $5/2$ kernel for the numerical variables, and a categorical kernel that is specific to each method. Each of these kernels have hyperparameters that influence the behavior of the synthetic data sets drawn from them, ranging from lengthscales and outputscales to noise coefficients. In order to train a PFN to behave like its PDGM, it is imperative that these hyperparameters are chosen appropriately.
+
+In PFNs4BO [@pfns4bo], a PFN was trained on a HEBO [@hebo] PDGM. Each hyperparameter hailed from a prior distribution, so they could be sampled efficiently and independently before generating a synthetic data set. For example, before generating each synthetic data set, the lengthscale was sampled from a $Gamma(\alpha_0,\beta_0)$ distribution and the outputscale was sampled from a $Gamma(\alpha_1,\beta_1)$ distribution. This allowed the PFN to witness a variety of different scenarios during training, which led to better performance after training. 
+
+In preliminary experiments, we found that this method did not perform well in our setup. We suspected that the prior distributions we had assigned to each hyperparameter were a poor fit. We also suspected that the hyperparameters were not independent of each other, and thus should not be sampled as such. To fix these issues, we attempted to fit the PDGM to a randomly drawn synthetic data set, then extract the PDGM's fitted hyperparameters and use them when generating synthetic data for the PFN. This guaranteed an authentic set of hyperparameters were used to generate synthetic data for the PFN, although it led to substantially increased training times.
+
+<!--
+### Hyperparameter Sampling 
+We started off choosing some synthetic functions, sampling inputs $x$ and calculating their corresponding $y$ values. We would fit the given model to this data, and record the model's fitted hyperparameters. After many repetitions, we recorded a large number of these hyperparameters. We then attempted to fit probability distributions to the recorded hyperparameters, allowing us to sample new hyperparameters during the PFN training process. This led to very poor PFN performance. 
+
+We suspected that the fitted distributions might not fit so well, so we also tried saving a list of values for each hyperparameter, and randomly drawing from this list instead of the fitted distributions. This ensured that the hyperparameters were drawn from a realistic distribution. However, this also led to poor PFN performance.
+
+The next suspected issue was that we had assumed independence between different hyperparameters. To fix this, we wanted to record entire sets of hyperparameters together. The number of dimensions, the number of categorical dimensions, and the number of categories per categorical dimension are all randomly selected during training. Because of this, we had to draw these sets of hyperparameters during training. We had to draw a random data set, fit the prior to it, record the hyperparameters, restart the prior, assign the recorded set of hyperparameters to it, and then use that new prior to sample training data for the PFN. This substantially increased the training time, but it also ensured that the prior had authentic sets of hyperparameters when sampling training data. This method actually led to superior PFN performance.
+-->
+
+<!--
+\begin{algorithm}[H]
+    \caption{Generate synthetic training data for a PFN}
+    \label{alg:getBatch}
+    \begin{algorithmic}
+    \State Input: input space $X$, prior $P$ with hyperparameters $\theta_P$
+    \State sample $\textbf{x}=\{x_i|x_i\in X\}$ uniformly across the input space
+    \State sample $\textbf{y}=\{y_i|y_i\sim N(0,1)\}$
+    \State fit $P$ to $\{(x_i,y_i)|x_i\in\textbf{x},y_i\in\textbf{y}\}$
+    \State $h\gets\theta_P$
+    \State re-initialize $P$
+    \State $\theta_P\gets h$
+    \State sample $\textbf{y}|\textbf{x}$ from the prior
+    \State $D\gets\{(x_i,y_i)|x_i\in\textbf{x},y_i\in\textbf{y}\}$
+    \Return $D$
+    \end{algorithmic}
+\end{algorithm}
+-->
+
+At the start of this process, we needed to sample a random data set for the PDGM to fit to. We found that drawing a small number of $x$ values from the input space, and then drawing $y\sim N(\mu=0,\sigma^2=1)$ for each point $x$ led to the best performance. The randomness of the $y$ values allowed for a wide variety of situations to occur, which in turn led to a realistic distribution of hyperparameters for the PDGM. The number of points impacted the distribution of hyperparameters. If too many points were drawn, the PDGM would act as if it was fitting to noise, becoming inflexible with high uncertainty. The hyperparameters would reflect this, and the corresponding trained PFN would become similarly inflexible. With too few points, the PDGM wouldn't have much to fit to, and so it would also become rather inflexible. As discussed in section \@ref(evalResults), we found optimal performance when we increased the number of points with the number of dimensions in the input space, which led to the PFNs being flexible with calibrated and accurate predictive distributions. 
+
+## Mixed-PDGM PFNs
+
+After training numerous PFNs using the three PDGMs individually, we attempted to train PFNs on a mixture of those PDGMs. Each time a training data set was needed to train the PFN, one of the PDGMs was selected at random. This PDGM would then generate one entire data set on its own. The process was simple, but it ideally exposed the PFN to a wider variety of function behaviors, which would potentially improve performance in full BO runs. We trained multiple mixed-PDGM PFNs, each with different probabilities of each PDGM being selected. 
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,154 @@
+# Background and Related Work {#background}
+
+In this section we cover related works and background information that pertains to this work. We begin by defining black box optimization, then discuss Bayesian optimization. After that, we introduce mixed variable Bayesian optimization, and some associated methods designed for that problem. We conclude the chapter with an introduction and description of prior-data fitted networks, an alternative surrogate model to Gaussian processes.
+
+## Black Box Optimization
+
+Let $X\subseteq\mathbb{R}^d$ for some $d\in\mathbb{N}$, and $f:X\to\mathbb{R}$. Black box optimization problems are a class of problems for which we want to find $x^*$ such that
+
+$$x^*\in\text{argmin}_{x\in X}f(x)$$
+
+[@bayesoptbook]. We assume the objective $f$ has no functional form, no access to the derivatives of $f$, the values $f(x)$ are potentially subject to random noise, and there is a cost associated with the computation of $f(x)$. The goal is to minimize the objective function $f$ while also minimizing the number of queries that need to be made during the optimization procedure.  
+
+## Bayesian Optimization
+
+Bayesian optimization is an iterative method used for black box optimization problems [@bayesoptbook] [@expectedImprovement] [@probabilityImprovement]. Given a set of recorded data from previous iterations, it yields a suggestion for the next attempt. For each iteration, there are three components: the fitting of a surrogate function, the optimization of an acquisition function, and the update of the recorded data set, shown in Algorithm \@ref(alg:bayesianoptimization) [@takingHumansOutTheLoop].
+
+
+\begin{algorithm}[H]
+    \caption{Bayesian Optimization}
+    \label{alg:bayesianoptimization}
+    \begin{algorithmic}
+    \State \textbf{input:} objective function $f$, surrogate function $\hat{m}$, acquisition function $\alpha$, initial observations $D_1=\{(x_i,y_i)|i\in1,...,k\}$, number of iterations $N$
+    \For{$n=1,2,3,...,N$}
+        \State fit surrogate function $\hat{m}$ to prior observations $D_n$
+        \State select new $x_{n+1}$ by optimizing acquisition function $\alpha$\\
+            $$x_{n+1}=\text{argmax}_{x\in X} \alpha(x;\ \hat{m}, D_n)$$
+        \State query objective function $y_{n+1}=f(x_{n+1})$ 
+        \State augment data $D_{n+1}\gets D_n\cup(x_{n+1},y_{n+1})$
+    \EndFor
+    \State $(x^*,y^*)=(x_j,y_j)$, given $j=\text{argmax}_{y_i\in D_N}\ y_i$
+    \State \Return best configuration $x^*$, best observed value $y^*$
+    \end{algorithmic}
+\end{algorithm}
+
+
+The surrogate function, usually some form of a Gaussian process, is fit to the recorded data. Gaussian processes can be seen as a probability distribution over functions, defined by a mean function $\mu:X\to\mathbb{R}$ and a covariance function $K:X\times X\to\mathbb{R}$ [@bayesoptbook]. Let $D=\{(x_i,y_i)|i\in1,...,n, x\in X,y\in\mathbb{R}\}$ be a set of observations, $\textbf{x}=\{x_i|x_i\in D\}$, $\textbf{y}=\{y_i|y_i\in D\}$, and $\mu_{\textbf{y}}=\frac{1}{n}\sum_{i=1}^ny_i$. The Gaussian process can be conditioned on the set of observations $D$. When fitting to $D$, the fitted mean and covariance functions can be calculated as:
+
+$$\mu_D(x)=\mu(x)+K(x,\textbf{x})\Sigma^{-1}(\textbf{y}-\mu_{\textbf{y}})$$
+$$K_D(x,x')=K(x,x')-K(x,\textbf{x})\Sigma^{-1}K(\textbf{x},x')$$
+
+with $\Sigma=K(\textbf{x},\textbf{x})$ such that $\Sigma_{ij}=K(x_i,x_j)$ [@bayesoptbook].
+
+Given a test point $x'$ after fitting, the Gaussian process outputs a posterior distribution over the possible $y'$ values, with $y'\sim N(\mu=\mu_D(x'), \sigma^2=K_D(x',x'))$. It should be noted that these results assume no observational noise, although it is not difficult to incorporate more general assumptions about noise into the model. For more information about Gaussian processes, we refer the reader to \underline{Gaussian processes for machine learning} [@rasmussen] and \underline{Bayesian Optimization} [@bayesoptbook].
+
+The surrogate function need not be a Gaussian process (see section \@ref(pfnBackground)), but after fitting to the recorded data, for a given input $x$, the output must be a posterior probability distribution over possible values for the target $y$. Ideally, the surrogate model will approximate the black box objective function, allowing access to its functional form, derivatives, and uncertainty estimates that we can't access through the unknown black box objective.
+
+Next, the acquisition function estimates the utility of evaluating a given point $x$ in the next iteration. The goal is to produce high values in unexplored regions, as well as in previously explored regions that are known to yield high values from the objective $f$. By combining the surrogate function's outputs and uncertainty, the acquisition function is able to provide an efficient balance between exploration and exploitation. Prior work has introduced several acquisition functions, such as expected improvement [@expectedImprovement] or probability of improvement [@probabilityImprovement]. An example can be seen in Figure \@ref(fig:example-gp-acq), where a Gaussian process has been fit to 5 observations, and the expected improvement has been plotted below. 
+
+The acquisition optimizer attempts to maximize the acquisition function, finding the point $x$ that yields the greatest utility at that stage in the optimization run. Unlike the objective $f$, the acquisition function is differentiable, which aids in the optimization process. A wide variety of acquisition optimizers have been proposed as well. For a more detailed introduction to Bayesian optimization, we refer the reader to \underline{Bayesian Optimization} [@bayesoptbook].
+
+```{r messgae=FALSE, echo=FALSE, warning=FALSE}
+suppressMessages(library(ggplot2))
+suppressMessages(library(dplyr))
+suppressMessages(library(cowplot))
+```
+
+```{r example-gp-acq, fig.cap="A Gaussian process, fit to 5 training points, and the corresponding values for the expected improvement", fig.width = 6, fig.height = 8, echo=FALSE, warning=FALSE}
+data <- read.csv("../data_for_thesis_figures/GP_example.csv")
+training_data <- read.csv("../data_for_thesis_figures/GP_example_training_data.csv")
+
+  
+plot1 <- ggplot(data, aes(x = X, y = GPMean)) +
+  geom_ribbon(aes(ymin = GPLB, ymax = GPUB), 
+              fill = "lightblue", alpha = 0.99, size=0) +
+  geom_line(color='blue') +
+  geom_point(data=training_data, aes(x=X,y=Y)) +
+  labs(title = "Gaussian Process", x = "Input", y = "Output Value")
+
+  
+plot2 <- ggplot(data, aes(x = X, y = Acq)) + 
+  geom_line(color='blue') +
+  labs(title = "Acquisition Function", x = "Input", y = "Expected Improvement")
+
+plot_grid(plot1, plot2, ncol=1, top = 'Example Gaussian Process with Acquisition Function')
+```
+
+<!-- 
+Bayesian optimization methods are limited in a number of ways. Firstly, they rely heavily on a gaussian process for their surrogate function. Gaussian processes become computationally unwieldy as the number of data points increases. This leads to large fitting times and MAYBE large acquisition optimization times. 
+-->
+
+## Mixed Variable Bayesian Optimization
+
+Often, real-world black box optimization problems involve categorical variables as inputs. These problems have categorical or discrete variables that need to be treated differently than continuous variables. Let $X\subseteq \mathbb{R}^{d_1}\times\mathbb{N}^{d_2}$ with $d_1,d_2\in\mathbb{N}$, and $f:x\to\mathbb{R}$. As before, we want to find $x^*$ such that
+
+$$x^*\in\text{argmin}_{x\in X}f(x)$$
+
+These problems have resulted in a class of mixed variable Bayesian optimization methods that can handle categorical and continuous inputs. These methods utilize surrogate functions that have been specifically designed for mixed variable tasks. When using Gaussian processes as the surrogate function, this is usually accomplished by combining a numerical and categorical kernel. Categorical kernels are used to estimate a covariance between different categories across different categorical variables. The numerical and categorical kernels are then combined using kernel addition and multiplication to yield an output. 
+
+The optimization of the acquisition function also presents its own set of challenges, since traditional numerical optimizers cannot optimize over categorical variables. A brute force approach might be to, for each combination of categorical variables, optimize with respect to the numerical variables. However, the number of categorical combinations grows exponentially with the number of categorical dimensions, rendering this approach unfeasible for tasks with high categorical dimensionality.
+
+In pursuit of improved mixed variable black box optimization, a variety of Bayesian optimization algorithms have been proposed. Recently, [@mcbo] implemented and conducted large scale comparisons between a number of these methods. We base our work on this study, and have chosen to focus on three methods included in this benchmark.
+
+#### CoCaBO
+
+CoCaBO (COntinuous and CAtegorical Bayesian Optimisation) [@cocabo] proposed a mixture of a kernel for continuous inputs $k_x(x,x')$ and a kernel for categorical inputs, $k_h(h,h')$. Faced with pros and cons of using the sum or product of the two kernels, they opted to use both, mixing the sum and product of the continuous and categorical kernels, weighted by a parameter $\lambda\in[0, 1]$:
+
+$$k_z(z,z')=(1-\lambda)(k_x(x,x')+k_h(h,h'))+\lambda k_x(x,x')k_h(h,h').$$
+
+For the categorical inputs, they proposed the use of an overlap kernel. Let $c$ be the number of categorical variables, and $\sigma$ be a tunable lengthscale parameter. Then, $k_h(h,h')=\frac{\sigma}{c}\sum_{i=1}^c\delta(h_i,h'_i)$, where $\delta(h_i,h_i')=1$ if $h_i=h'_i$ and zero otherwise. For the acquisition function, they chose expected improvement, and for the acquisition optimizer they proposed to use a Multi-Armed Bandit [@cocabo] system to optimize over the categorical inputs, and a more traditional numerical optimizer for the continuous inputs. 
+
+#### Casmopolitan
+
+Casmopolitan (CAtegorical Spaces, or Mixed, OPtimisatiOn with Local-trust-regIons & TAilored Non-parametric) [@casmopolitan] also uses a mixture between the sum and product of a numerical and categorical kernel. For categorical inputs, however, they employ a transformed overlap kernel:
+
+$$k_h(h,h')=\exp\left(\frac{1}{d_h}\sum_{i=1}^{d_h}l_i\delta(h_i,h'_i)\right)$$
+
+with lengthscales $l_i$, and $d_h$ being the number of categorical dimensions in the given task. This kernel has increased flexibility over CoCaBO due to the different lengthscales that can be fitted during training. Expected improvement is used for the acquisition function, and for the acquisition optimizer, they use an interleaved search, optimizing the categorical inputs, conditioning on them, and then optimizing the continuous inputs. They also employ a trust region to prevent over-exploration during the procedure [@casmopolitan].
+
+#### BODi
+
+BODi (Bayesian Optimization over High-Dimensional Combinatorial Spaces via Dictionary-based Embeddings) [@bodi] uses a Hamming embedding via dictionaries. For each BO iteration, a new dictionary $\textbf{A}$ is randomly generated, which is used to compute an embedding $\phi_\textbf{A}(z)$ with the observations $\textbf{z}$ [@bodi]. A GP is then fit to this embedding, which is used as the surrogate function. Similarly to the Casmopolitan [@casmopolitan] approach, the acquisition function is expected improvement and the acquisition optimizer is the interleaved search. BODi does not employ a trust region. 
+
+\vspace{\baselineskip}
+
+CoCaBO [@cocabo], Casmopolitan [@casmopolitan], and BODi [@bodi] are all proposed methods for mixed-variable Bayesian Optimization. However, all three rely on Gaussian processes for the surrogate function, which, as noted earlier, do not scale well with high number of data or dimensions. They also lack flexibility in that their posterior distributions must be strictly Gaussian.
+
+Framework and Benchmarks for Combinatorial and Mixed-variable Bayesian Optimization (MCBO) [@mcbo] introduced a modular framework for implementing a wide variety of BO methods. It allows for the selection of a surrogate function, acquisition function, and acquisition optimizer to form a BO method. They implemented a number of existing techniques, as well as some novel combinations of different BO components. They also implemented a variety of synthetic and real-world tasks for the purposes of evaluating the different methods. Throughout the rest of this work, we use MCBO's implementations of these different BO algorithms and tasks in our training procedure, evaluations, and experiments. 
+
+## Prior-Data Fitted Networks {#pfnBackground}
+
+Prior-Data Fitted Networks are a type of transformer that have been trained to do Bayesian inference [@transformersDoInference]. In PFNs4BO [@pfns4bo], prior-data fitted networks (PFNs) were proposed as a surrogate model in Bayesian optimization. As input, they take a training data set with a variable number of features and observations, and a test data set containing only inputs. For each observation in the test data set, the output is a predictive distribution over the possible $y$ values. It is trained using synthetic data generated from a Prior-Data Generating Model (PDGM), with the choice of PDGM being extremely flexible. 
+
+[@pfns4bo] showed that trained PFNs were able to observe a training and test data set, and then produce predictive distributions that accurately approximated the behavior of its respective PDGM, all in a single forward pass, and at a fraction of the computational expense of traditional GPs. PFNs have added flexibility in the sense that they can be trained on a wide class of PDGMs, and the outputted distributions can approximate any abstract continuous probability distribution, not just Gaussians. 
+
+The architecture of a PFN is a Transformer [@attentionisallyouneed], which consists of an encoder and a decoder. The encoder relies on an attention mechanism to encode a variable amount of inputs into a vector representation, and the decoder is able to convert that vector representation into a desired output. This allows PFNs to take training and test data sets as input, that are variable in both number of data points and number of dimensions. 
+
+```{r example-pfn-pdf, fig.cap="A PFN's predictive distribution for one data point", echo=FALSE, warning=FALSE}
+data <- read.csv("../data_for_thesis_figures/pfn_output_example.csv") %>%
+  filter(X0 > -2) %>%
+  filter(X0 < 0)
+  
+ggplot(data, aes(x = X0, y = X1)) +
+  geom_line() +
+  labs(title = "Example PFN Predictive Distribution", x = "Value", y = "Density")
+```
+
+The PFN's output is a probability distribution over the possible target values. Specifically, this output is in the form of a Riemann distribution, illustrated in Figure \@ref(fig:example-pfn-pdf). This is a highly flexible, discrete approximation of a continuous distribution. Riemann distributions are piecewise constant, essentially discretising the real-valued output space into a predetermined number of "buckets". The boundary of each bucket is decided upon prior to training. When making a prediction, the PFN outputs the logit value that a test $y$ point will fall into each bucket. This converts the PFN's task from regression into a classification problem, as it is made to predict which bucket a test $y$ value will fall into. 
+
+PFNs4BO [@pfns4bo] was able to train PFNs to successfully imitate a HEBO [@hebo] PDGM. They were able to produce similar performance to HEBO in full optimization runs, at reduced computational cost. However, they focused only on continuous variables, and did not apply PFNs to mixed variable spaces with categorical variables. 
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      

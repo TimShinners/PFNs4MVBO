@@ -1,0 +1,50 @@
+
+```{r stuff, warning=FALSE, echo=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+ 
+data <- read.csv("../data_for_thesis_figures/BO_1v1.csv") %>%
+  mutate(task_name = case_when(
+    grepl("All Tasks", task_name) ~ "All Tasks",
+    grepl("griewank", task_name) ~ "Griewank",
+    grepl("levy", task_name) ~ "Levy",
+    grepl("rosenbrock", task_name) ~ "Rosenbrock",
+    grepl("schwefel", task_name) ~ "Schwefel",
+    grepl("michalewicz", task_name) ~ "Michalewicz",
+    grepl("xgboost_opt", task_name) ~ "XGBoost Opt.")) 
+
+data <- data %>%
+  filter(iteration == 200) %>%
+  filter(task_name == "All Tasks")
+
+cocabo_prop <- data %>%
+  filter(optimizer == "PFN-CoCaBO")
+casmo_prop <- data %>%
+  filter(optimizer == "PFN-Casmopolitan")
+bodi_prop <- data %>%
+  filter(optimizer == "PFN-BODi")
+```
+
+# Conclusion {#discussion}
+
+PFNs have been shown to perform well as a surrogate function in fully continuous BO methods. Real-world problems, such as hyperparameter tuning for machine learning models, often involve categorical dimensions. In this work, we studied how to extend PFNs for these mixed variable problems. 
+
+We outlined a general method to sample the PDGM's hyperparameters during the PFN training procedure. We applied Weitzman's overlap [@overlap] to score the similarity between a PFN and its PDGM during regression tasks. We trained three PFNs on three different PDGMs, as well as one PFN trained on a mixture of the three. In Section \@ref(results), we used our implementation of a PFN-based BO method to conduct experiments, determining the usefulness of the trained PFNs.
+
+In our experiments, findings suggested that similar performance could be expected after switching a BO method's surrogate function from a GP to a PFN, while holding the acquisition function and acquisition optimizer constant. In regression settings, the PFNs outperformed their respective GPs for small amounts of data. In BO settings, the PFNs were competitive, with the Casmopolitan-trained PFN nearly achieving the best rank out of all the methods included in the experiments. At the termination of the BO runs, the proportion of trials in which PFN-based methods were ahead of their GP-based counterparts was `r sprintf("%.2f", round(cocabo_prop$mean_proportion, digits=2))`, `r sprintf("%.2f", round(casmo_prop$mean_proportion, digits=2))`, and `r sprintf("%.2f", round(bodi_prop$mean_proportion, digits=2))`, for the CoCaBO-PFN, Casmopolitan-PFN, and BODi-PFN, respectively. The results were similarly close when calculating the average difference in best suggestions between the PFNs and their GP-based counterparts. The overarching theme of the results suggest that, in reference to research question 1.1, the PFNs exhibit similar quality in performance when compared to GPs as a surrogate function in a BO setting.
+
+Training a PFN on a mixture of PDGMs did not yield improvements over the other PFNs. In a regression setting, the mixed-PDGM PFN performed similarly to the other PFNs when compared to the GP-based models, and it ranked second-best when compared to the other PFNs. In BO settings, the mixed-PDGM PFN did not exhibit substantial superiority over any of the other PFNs. With regard to research question 1.2, we conclude that we were unable to improve PFN performance when training on a mixture of PDGMs. 
+
+Lastly, in Section \@ref(rq1-3), we showed that, for BO runs lasting longer than 500 iterations, there is a distinct advantage to using PFNs in terms of computational expense. While this difference was not observable in the opening iterations, after enough observations have been recorded it becomes clear and obvious that the PFN-based methods observe and suggest much faster than GPs in a BO loop. With regard to research question 1.3, PFNs hold a substantial advantage over GPs in terms of computational expense.
+
+Given their similar performances in BO runs, and the substantial reduction in computational expense for PFNs, we conclude that our PFNs provide a beneficial alternative to GPs as the surrogate function in a mixed variable BO setting.
+
+
+#### Future Works {#futureWork}
+
+There are a number of directions to go with future work in this area. Firstly, it should not be difficult to increase the maximum number of dimensions that the PFNs can take as input. The maximum number of dimensions is a tunable parameter that must be selected prior to the start of training. In PFNs4BO [@pfns4bo], it was set to 18, and in following their training procedure, we opted to leave it at 18. Increasing this parameter would lead to increased computational expense during training, but it would also generalize the PFN's applicability to a wider class of mixed variable objective functions. Some other training parameters may need to be retuned, but besides that this would likely make for a very simple extension of this work. 
+
+Also during the training procedure, to generate training data for the PFN we sampled batches of data from the PDGM, and then split these batches into a training and test set. An alternative would be to decouple the sampling process for the training and test sets. One could draw the training data from some predetermined source (like a different Gaussian process, or a class of functions like polynomials), then fit the PDGM to that training data and sample the test data from the PDGM. This would likely lead to increased training times, since one batch of data could not be split multiple times. However, it would eliminate all issues regarding the PDGM's hyperparameter distributions, since the hyperparameters would be defined during the fitting process. This would allow the PFN to learn how the PDGM behaves with respect to different sources of training data as well. An implementation of this idea would likely lead to a drastic increase in the PFN's overlap score for a given PDGM. 
+
+Lastly, in our evaluation and experiments, we did not conduct any tests with noisy observations. If random noise were to be added to the objective functions during the evaluation and experimentation of the PFNs, the results may come out differently. It may also be interesting to assess PFN performance with respect to the amount of noise added to the objective. 

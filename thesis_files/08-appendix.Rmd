@@ -1,0 +1,329 @@
+`r if(knitr:::is_latex_output()) '\\appendix'`
+
+`r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'` 
+
+# Failed PFN Training Techniques {#failedpfntrainingideas}
+
+In this section, we discuss PFN training techniques that were attempted, but resulted in poor PFN performance.
+
+First, to sample the PDGM's hyperparameters described in Section \@ref(methods1), we needed a way to generate small data sets for the PDGM to fit to. We draw a set of input $x$ points and sample targets $y\sim N(\mu=0,\sigma^2=1)$. Instead of directly sampling $y$, we used $y=\cos(a^T x)$, with the elements of $a$ being drawn uniformly from the range $[0,7]$. However, this led to PFNs that were very inflexible and performed very poorly, with the exception of the BODi-trained PFN. 
+
+Second, we attempted different categorical encodings, which is required to pass data to the PFN. By default, the numerical variables are scaled to the range $[0,1]$, and categorical variables are represented with integer values $\{0,1,...\}$. If the input space contained a binary categorical variable, the PFN would only see the values $0$ and $1$, making it potentially difficult to discern whether it was a categorical variable or numeric. We also found it potentially problematic that the categorical values were on such a different scale. The PFNs were not compatible with the high dimensionality that resulted from one-hot encodings. We attempted three different categorical encodings: adding 2 to each categorical variable (a binary categorical variable would now have the values $\{2,3\}$ instead of $\{0,1\}$), rescaling the categorical values to the range $[0,1]$, and combining these two ideas, rescaling and then adding 2, so that all categorical values were rescaled to the range $[2,3]$. All of the PFNs trained using any of these categorical encodings performed very poorly, so we used the default encoding.
+
+Third, we tried to manually rescale the buckets of the PFN's Riemann distribution. The PFN's Riemann distributions tended to have very high resolution near its center, with that resolution decreasing further out. The thought was, with manually rescaled buckets, the needlessly high resolution towards the center could be traded for higher resolution further out, giving the PFN more predictive ability for points with low likelihood. We attempted to scale the PFN's buckets with a variety of different coefficients. All of these efforts led to inferior performance from the PFNs. 
+
+It is not particularly clear why all of these ideas failed to improve PFN performance. We anticipated certain problems that the PFN might encounter, and it is conceivable that the aforementioned ideas are all solutions to problems that might not exist in the first place. 
+
+# Acquisition Optimizer Settings {#acqOptimTests}
+
+In initial BO trials, we found that the default settings for the MCBO [@mcbo]  implementations of different acquisition optimizers led to prohibitively long computation times to produce a suggestion. Specifically, in this work, we focused on the Multi-Armed Bandit (MAB) [@cocabo] and Interleaved Search (IS) [@casmopolitan] acquisition optimizers. For MAB, we identified one parameter, and for IS, two parameters that could be altered to decrease the optimizer's computational budget. We created a test so that we could investigate the trade-off between time and performance, allowing us to bring the computation times to a viable level while only incurring a small, acceptable drawback in optimizer performance.
+
+For the test, we chose four synthetic tasks from the MCBO [@mcbo] package. For each task, a number of numerical and categorical dimensions was randomly drawn. Then, we initialized a BO loop. We initialized two acquisition optimizers, one with the default settings, and one with the "faster" settings. At each iteration, both acquisition optimizers produced a suggestion. The $y$ values for both suggestions were calculated and recorded. The "faster" suggestion was used for the observation in the next iteration of the loop. Each BO loop went on for 100 iterations.
+
+We did this test for a variety of different settings and configurations. After the tests concluded, the $y$ values were rescaled for each task such that 
+
+$$\textbf{y}_{\text{rescaled}}=\frac{\textbf{y}-y_{\min}}{y_0-y_{\min}}$$
+
+where $\textbf{y}$ is an array of all $y$ values recorded for a given task, $y_{\min}$ is the minimum value across all optimization runs for that task, and $y_0$ is the best $y$ value prior to the optimization run ($y_0$ comes from the randomly drawn initial observations). While not all of the $y$ values necessarily fell into the range $[0,1]$, it provided a rough way to standardize the acquisition optimizers' suggestions across different tasks. 
+
+After this rescaling, we calculated the difference between the $y$ value associated with the "fast" suggestion and the "default" suggestion, and we averaged this difference across all tasks and iterations. This gave us a measure for the sacrifice in performance when switching to "faster" settings. The results of these tests are shown in Figures \@ref(fig:mab-acq-optim-test) and \@ref(fig:is-acq-optim-test). It is worth noting that, when the test was run with default settings, the average difference did not perfectly come out to 0. We believe there may have been some leaked randomness somewhere in the test, and we note that while the differences were not perfectly 0, they were fairly close.
+
+```{r mab-acq-optim-test, fig.cap="The performance vs. compute trade-off for the MAB acquisition optimizer, when changing the n_cont_iter setting between values 1, 10, and 100 (default)", echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+data <- read.csv("../data_for_thesis_figures/acq_optim_test_mab.csv") 
+
+ggplot(data, aes(x=mean_time, y=mean_diff, color=n_cont_iter)) +
+  geom_point() +
+  labs(title = 'Performance vs. Compute Trade-off for MAB Acquisition Optimizer', 
+       x ="Average Time Per Suggestion (Seconds)", y = "Average Scaled Difference To Default Suggestion") + 
+  guides(color = guide_legend(reverse = TRUE)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black")
+
+```
+
+In Figure \@ref(fig:mab-acq-optim-test), the average time per suggestion is plotted against the average difference in $y$ value between the faster settings and the default settings for the MAB optimizer. From this test, we concluded that setting the `n_cont_iter` parameter to 10 maintained a high quality of suggestions, while decreasing the average computation time per suggestion from over 10 seconds to less than 2.5. For this reason, we set the value to 10 throughout all of our evaluations and experiments.
+
+```{r is-acq-optim-test, fig.cap="The performance vs. compute trade-off for the IS acquisition optimizer, when changing the n_restarts and n_iter settings across a range of values.", echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+data <- read.csv("../data_for_thesis_figures/acq_optim_test_is.csv") 
+
+ggplot(data, aes(x=mean_time, y=mean_diff, color=setup)) +
+  geom_point() +
+  xlim(0, 12) +
+  ylim(0, 0.3) +
+  labs(title = 'Performance vs. Compute Trade-off for IS Acquisition Optimizer', 
+       x ="Average Time Per Suggestion (Seconds)", y = "Average Scaled Difference To Default Suggestion") + 
+  guides(color = guide_legend(reverse = TRUE)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black")
+
+```
+
+As done previously, the average time per suggestion is plotted against the average difference in $y$ value in Figure \@ref(fig:is-acq-optim-test), this time with respect to different settings for the IS optimizer. From this test, we decided that the optimal configuration involved setting the number of restarts to 2, and the number of optimization iterations to 10. This new configuration yielded suggestions that were, on average, only 0.05 worse than suggestions from the default configuration. At the same time, the average computation time decreased to roughly $\frac{1}{5}$ that of the default configuration. We deemed this to be an acceptable trade-off between computation time and performance, so we used this configuration with the IS optimizer throughout our evaluations and experiments. 
+
+# PFN Behavior in a Regression Setting {#modelFitExamples}
+
+This section is a small investigation into the behavior of different models when fit to training data. We fit each model to training data sets of different sizes, drawn from the Ackley function with one continuous variable and one binary categorical variable. Figures \@ref(fig:exampleModelFitBODi), \@ref(fig:exampleModelFitCasmo), and \@ref(fig:exampleModelFitCoCaBO) show how the PFNs, as well as their respective PDGMs, fit to different amounts of training data. The surrogate functions from BODi, Casmopolitan, and CoCaBO differ only in their categorical kernels, and there is only one binary categorical variable in this setting, so their behavior appears extremely similar across Figures \@ref(fig:exampleModelFitBODi), \@ref(fig:exampleModelFitCasmo), and \@ref(fig:exampleModelFitCoCaBO). 
+
+We note that the GP-based models have an occasional tendency to fit very inflexibly to training data. This behavior can be seen in the setting with 5 training points in the plots below. It usually only occurs in settings with less training data, and it may be a contributing factor as to why the PFNs performed better in this setting in the regression experiments in Section \@ref(results), since the PFNs do not exhibit this behavior. Aside from this, we note the general similarity between each PFN and its PDGM. For the most part, there are no major deviations between each PFN and its PDGM. 
+
+```{r exampleModelFitBODi, fig.cap="PFN-BODi and BODi's surrogate model, fit to different amounts of training data. The colored lines represent the model's posterior means for each category, and the region between the region between the 0.025 and 0.975 percentile is shaded. The black lines represent the ground truth of the objective function, and the points illustrate the training data that was drawn from the objective function.", warning=FALSE, echo=FALSE, message=FALSE, fig.height=8}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+ 
+training_data <- read.csv('../data_for_thesis_figures/example_model_fits_training_data.csv') %>%
+  mutate(category = as.character(category))%>%
+  filter(n_dat != 100)
+data <- read.csv('../data_for_thesis_figures/example_model_fits.csv') %>%
+  mutate(category = as.character(category)) %>%
+  filter(n_dat != 100) %>%
+  mutate(optimizer = case_when(
+    grepl("pfn_bodi", optimizer) ~ "PFN-BODi",
+    grepl("pfn_cocabo", optimizer) ~ "PFN-CoCaBO",
+    grepl("pfn_casmopolitan", optimizer) ~ "PFN-Casmopolitan",
+    grepl("bodi", optimizer) ~ "BODi",
+    grepl("cocabo", optimizer) ~ "CoCaBO",
+    grepl("casmopolitan", optimizer) ~ "Casmopolitan",
+    grepl("BODi", optimizer) ~ "BODi",
+    grepl("CoCaBO", optimizer) ~ "CoCaBO",
+    grepl("Casmopolitan", optimizer) ~ "Casmopolitan"))
+
+data$optimizer <- factor(data$optimizer, levels = c("Random Baseline",
+                                                    "PFN-BODi",
+                                                             "PFN-Casmopolitan",
+                                                             "PFN-CoCaBO",
+                                                             "BODi",
+                                                             "Casmopolitan",
+                                                             "CoCaBO",
+                                                    "PFN-Mixed"))
+
+data <- data %>%
+  filter(optimizer %in% c('BODi', 'PFN-BODi'))
+
+ground_truth <- data %>%
+  mutate(category = paste(category, "e"))
+
+ggplot(data, aes(x = x, y = optimizer_output, color=category)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=category), 
+               alpha = 0.4, size=0) +
+  geom_line() +
+  geom_line(data = ground_truth, aes(x = x, y = ground_truth, color=category), linetype=1) +
+  geom_point(data=training_data, aes(x = x, y = y, color = category), size = 1.5)+
+  labs(title = 'PFN-BODi and BODi Predictive Outputs', 
+       x = "", y = "") + 
+  facet_grid(n_dat ~ optimizer, switch = "y") +
+  scale_color_manual(values = c('1'='#d12020', '0'='#2063D1', '0 e'='black', '1 e'='black')) +
+  scale_fill_manual(values = c('1'='#d12020', '0'='#2063D1', '0 e'='black', '1 e'='black')) +
+  theme(legend.position = "none", legend.box = "horizontal") +
+  theme(axis.ticks = element_blank(), 
+        axis.text = element_blank())
+
+```
+
+```{r exampleModelFitCasmo, fig.cap="PFN-Casmopolitan and Casmopolitan's surrogate model, fit to different amounts of training data. The colored lines represent the model's posterior means for each category, and the region between the region between the 0.025 and 0.975 percentile is shaded. The black lines represent the ground truth of the objective function, and the points illustrate the training data that was drawn from the objective function.", warning=FALSE, echo=FALSE, message=FALSE, fig.height=8}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+ 
+training_data <- read.csv('../data_for_thesis_figures/example_model_fits_training_data.csv') %>%
+  mutate(category = as.character(category))%>%
+  filter(n_dat != 100)
+data <- read.csv('../data_for_thesis_figures/example_model_fits.csv') %>%
+  mutate(category = as.character(category)) %>%
+  filter(n_dat != 100) %>%
+  mutate(optimizer = case_when(
+    grepl("pfn_bodi", optimizer) ~ "PFN-BODi",
+    grepl("pfn_cocabo", optimizer) ~ "PFN-CoCaBO",
+    grepl("pfn_casmopolitan", optimizer) ~ "PFN-Casmopolitan",
+    grepl("bodi", optimizer) ~ "BODi",
+    grepl("cocabo", optimizer) ~ "CoCaBO",
+    grepl("casmopolitan", optimizer) ~ "Casmopolitan",
+    grepl("BODi", optimizer) ~ "BODi",
+    grepl("CoCaBO", optimizer) ~ "CoCaBO",
+    grepl("Casmopolitan", optimizer) ~ "Casmopolitan"))
+
+data$optimizer <- factor(data$optimizer, levels = c("Random Baseline",
+                                                    "PFN-BODi",
+                                                             "PFN-Casmopolitan",
+                                                             "PFN-CoCaBO",
+                                                             "BODi",
+                                                             "Casmopolitan",
+                                                             "CoCaBO",
+                                                    "PFN-Mixed"))
+
+data <- data %>%
+  filter(optimizer %in% c('Casmopolitan', 'PFN-Casmopolitan'))
+
+ground_truth <- data %>%
+  mutate(category = paste(category, "e"))
+
+ggplot(data, aes(x = x, y = optimizer_output, color=category)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=category), 
+               alpha = 0.4, size=0) +
+  geom_line() +
+  geom_line(data = ground_truth, aes(x = x, y = ground_truth, color=category), linetype=1) +
+  geom_point(data=training_data, aes(x = x, y = y, color = category), size = 1.5)+
+  labs(title = 'PFN-Casmopolitan and Casmopolitan Predictive Outputs', 
+       x = "", y = "") + 
+  facet_grid(n_dat ~ optimizer, switch = "y") +
+  scale_color_manual(values = c('1'='#d12020', '0'='#2063D1', '0 e'='black', '1 e'='black')) +
+  scale_fill_manual(values = c('1'='#d12020', '0'='#2063D1', '0 e'='black', '1 e'='black')) +
+  theme(legend.position = "none", legend.box = "horizontal") +
+  theme(axis.ticks = element_blank(), 
+        axis.text = element_blank())
+
+```
+
+```{r exampleModelFitCoCaBO, fig.cap="PFN-CoCaBO and CoCaBO's surrogate model, fit to different amounts of training data. The colored lines represent the model's posterior means for each category, and the region between the region between the 0.025 and 0.975 percentile is shaded. The black lines represent the ground truth of the objective function, and the points illustrate the training data that was drawn from the objective function.", warning=FALSE, echo=FALSE, message=FALSE, fig.height=8}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+ 
+training_data <- read.csv('../data_for_thesis_figures/example_model_fits_training_data.csv') %>%
+  mutate(category = as.character(category))%>%
+  filter(n_dat != 100)
+data <- read.csv('../data_for_thesis_figures/example_model_fits.csv') %>%
+  mutate(category = as.character(category)) %>%
+  filter(n_dat != 100) %>%
+  mutate(optimizer = case_when(
+    grepl("pfn_bodi", optimizer) ~ "PFN-BODi",
+    grepl("pfn_cocabo", optimizer) ~ "PFN-CoCaBO",
+    grepl("pfn_casmopolitan", optimizer) ~ "PFN-Casmopolitan",
+    grepl("bodi", optimizer) ~ "BODi",
+    grepl("cocabo", optimizer) ~ "CoCaBO",
+    grepl("casmopolitan", optimizer) ~ "Casmopolitan",
+    grepl("BODi", optimizer) ~ "BODi",
+    grepl("CoCaBO", optimizer) ~ "CoCaBO",
+    grepl("Casmopolitan", optimizer) ~ "Casmopolitan"))
+
+data$optimizer <- factor(data$optimizer, levels = c("Random Baseline",
+                                                    "PFN-BODi",
+                                                             "PFN-Casmopolitan",
+                                                             "PFN-CoCaBO",
+                                                             "BODi",
+                                                             "Casmopolitan",
+                                                             "CoCaBO",
+                                                    "PFN-Mixed"))
+
+data <- data %>%
+  filter(optimizer %in% c('CoCaBO', 'PFN-CoCaBO'))
+
+ground_truth <- data %>%
+  mutate(category = paste(category, "e"))
+
+ggplot(data, aes(x = x, y = optimizer_output, color=category)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=category), 
+               alpha = 0.4, size=0) +
+  geom_line() +
+  geom_line(data = ground_truth, aes(x = x, y = ground_truth, color=category), linetype=1) +
+  geom_point(data=training_data, aes(x = x, y = y, color = category), size = 1.5)+
+  labs(title = 'PFN-CoCaBO and CoCaBO Predictive Outputs', 
+       x = "", y = "") + 
+  facet_grid(n_dat ~ optimizer, switch = "y") +
+  scale_color_manual(values = c('1'='#d12020', '0'='#2063D1', '0 e'='black', '1 e'='black')) +
+  scale_fill_manual(values = c('1'='#d12020', '0'='#2063D1', '0 e'='black', '1 e'='black')) +
+  theme(legend.position = "none", legend.box = "horizontal") +
+  theme(axis.ticks = element_blank(), 
+        axis.text = element_blank())
+
+```
+
+# Task-Specific BO Experiment Results {#appendixBOrank}
+
+In this section, we analyze the performance of different BO methods across the different objective functions that were included in our experiments in section \@ref(results). Figure \@ref(fig:bo-trajectory) illustrates the trajectories of each optimizer for each task, averaged over all setups. 
+
+Figure \@ref(fig:bo-rank-individual-tasks) depicts the average rank of each optimizer, for each task and iteration. Very loosely, we see that each PFN and its associated GP-based method tend to score similar rankings across the six tasks. We remark that, for the XGBoost optimization task, the CoCaBO-trained PFN performed best out of all models, while it ranked almost worst in other tasks. This highlights the extent to which optimizer performance is dependent on the objective function. With the Rosenbrock function, CoCaBO performed worst out of all the methods tested, including the random baseline. The reasons for this are unclear. We tested the CoCaBO-trained PFN with the same acquisition function and acquisition optimizer as CoCaBO, and it did not perform as poorly. Thus, the reason for CoCaBO's poor performance must have something to do with its surrogate function, but aside from that the reasons are unclear.
+
+```{r bo-trajectory, fig.cap="Trajectories of different optimizers with respect to iteration in BO run, averaged across all setups. 95% bootstrapped confidence intervals are represented by the shaded regions.", warning=FALSE, echo=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+
+colors <- c("#606060", "#a54176", "#00832c", "#00729c","#CC79A7", "#3f9f74", "#56B4E9", "#8f00ff")
+ 
+data <- read.csv("../data_for_thesis_figures/BO_trajectories.csv") %>%
+  mutate(task = case_when(
+    grepl("All Tasks", task) ~ "All Tasks",
+    grepl("griewank", task) ~ "Griewank",
+    grepl("levy", task) ~ "Levy",
+    grepl("rosenbrock", task) ~ "Rosenbrock",
+    grepl("schwefel", task) ~ "Schwefel",
+    grepl("michalewicz", task) ~ "Michalewicz",
+    grepl("xgboost_opt", task) ~ "XGBoost Opt.")) %>%
+  filter(optimizer != "PFN-Mixed")
+
+data$optimizer <- factor(data$optimizer, levels = c("Random Baseline",
+                                                             "BODi",
+                                                             "Casmopolitan",
+                                                             "CoCaBO",
+                                                             "PFN-BODi",
+                                                             "PFN-Casmopolitan",
+                                                             "PFN-CoCaBO",
+                                                              "PFN-Mixed"))
+
+ggplot(data, aes(x = iteration, y = best_y, color=optimizer, linetype=optimizer)) +
+  #geom_errorbar(aes(ymin=lb, ymax=ub), width=1) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer), 
+               alpha = 0.15, size=0) +
+  geom_line() +
+  labs(title = 'Optimizer BO Runs By Task', 
+       x = "Iteration", y = "Best Obtained Value") + 
+  labs(color = "Optimizer: ", fill = 'Optimizer: ', linetype='Optimizer: ')+
+  facet_wrap(vars(task), ncol=3, scales = "free_y") +
+  theme(legend.position = "bottom", legend.box = "horizontal") +
+  scale_linetype_manual(values = c(6,6,6,6,1,1,1,1)) +
+  scale_color_manual(values=colors) +
+  scale_fill_manual(values=colors) 
+
+```
+
+```{r bo-rank-individual-tasks, fig.cap="Ranks of different optimizers with respect to iteration in BO run, averaged across all tasks and all runs. 95% bootstrapped confidence intervals are represented by the shaded regions.", warning=FALSE, echo=FALSE, message=FALSE, fig.height=5}
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+ 
+data <- read.csv("../data_for_thesis_figures/BO_ranking_all_tasks.csv") %>%
+  filter(task != 'All Tasks') %>%
+  mutate(task = case_when(
+    grepl("All Tasks", task) ~ "All Tasks",
+    grepl("griewank", task) ~ "Griewank",
+    grepl("levy", task) ~ "Levy",
+    grepl("rosenbrock", task) ~ "Rosenbrock",
+    grepl("schwefel", task) ~ "Schwefel",
+    grepl("michalewicz", task) ~ "Michalewicz",
+    grepl("xgboost_opt", task) ~ "XGBoost Opt.")) %>%
+  filter(optimizer != "PFN-Mixed")
+
+data$optimizer <- factor(data$optimizer, levels = c("Random Baseline",
+                                                             "BODi",
+                                                             "Casmopolitan",
+                                                             "CoCaBO",
+                                                             "PFN-BODi",
+                                                             "PFN-Casmopolitan",
+                                                             "PFN-CoCaBO"))
+
+
+ggplot(data, aes(x = iteration, y = mean_rank, color=optimizer, linetype=optimizer)) +
+  #geom_errorbar(aes(ymin=lb, ymax=ub), width=1) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill=optimizer), 
+               alpha = 0.2, size=0) +
+  geom_line() +
+  labs(title = 'Average Rank', 
+       x = "Iteration", y = "Rank") + 
+  labs(color = "Optimizer: ", fill = 'Optimizer: ', linetype='Optimizer: ')+
+  facet_wrap(vars(task), ncol=3) +
+  theme(legend.position = "bottom", legend.box = "horizontal") +
+  scale_linetype_manual(values = c(6,6,6,6,1,1,1)) +
+  scale_color_manual(values=colors) +
+  scale_fill_manual(values=colors) 
+
+```
+
+
+

@@ -1,0 +1,8 @@
+
+
+Die Bayes'sche Optimierung ist ein Algorithmus, der zur Optimierung vieler Black-Box-Probleme verwendet wird, beispielsweise zur Hyperparameteroptimierung für Modelle des maschinellen Lernens. Oft verfügt die Blackbox-Funktion über einen gemischten Hyperparameterraum, der sowohl numerische als auch kategoriale Variablen umfasst. Prior-Data-Fitted-Networks (PFNs) sind Transformer, die darauf trainiert sind, sich ähnlich wie Gaußsche Prozesse (GPs) zu verhalten. Es hat sich gezeigt, dass sie als Modelle in Bayes'schen Optimierungsmethoden ähnlich gut wie GPs functioneren und Suchräume geringeren Rechenaufwand erfordern. Sie wurden jedoch noch nicht auf gemischte angewendet. In dieser Arbeit trainieren wir drei PFNs unter Verwendung vorhandener GP variationen mit gemischten Suchräume als Priors sowie einen PFN, der auf einer Mischung von Priors trainiert wird. Wir integrieren sie in MVBO-Methoden (Mixed Variable Bayesian Optimization) und führen Experimente mit sechs verschiedenen Black-Box-Funktionen durch, um ihr Verhalten zu bewerten. Die Ergebnisse deuten darauf hin, dass die Verwendung trainierter PFNs als Modelle in MVBO-Einstellungen eine ähnliche Leistung wie ihre auf GP basierenden Gegenstücke liefert und dabei nur einen Bruchteil des Rechenaufwands für lange Optimierungsläufe mit über 500 Iterationen erfordert.
+
+
+
+
+
