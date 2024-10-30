@@ -1,5 +1,7 @@
 # Prior-Data Fitted Networks Can Do Mixed-Variable Bayesian Optimization
 
+PFNs4BO showed that PFNs work good for bayesian optimization. 
+
 This repo contains much of the code used in my thesis, "Prior-Data Fitted Networks Can Do Mixed-Variable Bayesian Optimization" 
 
 **PFNsCanDoMVBO.pdf** is a pdf of the thesis.
