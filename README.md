@@ -12,19 +12,60 @@ In our (work)[https://github.com/TimShinners/PFNs4MVBO/blob/main/PFNsCanDoMVBO.p
 
 ### Use our models
 
+Below is a quick implementation of a Bayesian optimization loop, using a mixed-variable PFN as the surrogate model. 
+
+
+```python
+from mcbo import task_factory
+from mvpfn_optimizer import MVPFNOptimizer
+
+
+# Define dimensionality of the task
+num_dims = 3
+cat_dims = 4
+task_kws = dict(variable_type=['num'] + ['nominal'] * cat_dims,
+                            num_dims=[num_dims] + [1] * cat_dims,
+                            num_categories=np.random.randint(2, 10, cat_dims).tolist())
+
+# define the task and search space
+task = task_factory(task_name=task_name, **task_kws)
+search_space = task.get_search_space()
+
+
+# define the BO optimizer, which uses a PFN as a surrogate function
+optimizer = MVPFNOptimizer(search_space=search_space,
+                           input_constraints=task.input_constraints,
+                           pfn_file='pfn_cocabo_59.pth',
+                           acq_func='ei',
+                           acq_optim_name='mab')
+
+# initialize the optimizer
+x_init = search_space.sample(n_init)
+y_init = task(x_init)
+optimizer.initialize(x_init, y_init)
+
+# Run BO loop
+n_iterations = 100
+
+for i in range(n_iterations):
+
+    x = optimizer.suggest()
+    y = task(x)
+
+    optimizer.observe(x, y)
+
+```
 
 
 
 
 
 
+### Notes
 
+**PFNsCanDoMVBO.pdf** is a pdf of my master's thesis.
 
-
-
-**PFNsCanDoMVBO.pdf** is a pdf of the thesis.
-
-The fully trained PFNs that were used in our experiments are stored in the folder **trained_PFNs**
+The fully trained PFNs that were used in the experiments are stored in the folder **trained_PFNs**
 
 The scripts **train_COCABO.py**, **train_CASMO.py**, **train_BODI.py**, and **train_MIXED.py** contain code that will define hyperparameters and training settings, then train new PFNs from scratch. This procedure is discussed in Chapter 3 of the thesis.
 
