@@ -4,15 +4,13 @@ This repository extends the work done in [PFNs4BO](https://github.com/automl/PFN
 
 ### Background
 
-PFNs are a type of transformer that have been trained to do Bayesian inference. As input, they take a training data set with a variable number of features and observations, and a test data set containing only inputs. They output predictive distributions over the possible target values. PFNs are trained using synthetic datasets that are sampled from a Prior-Data Generating Model (PDGM), with the choice of PDGM being extremely flexible. 
+PFNs are a type of transformer that have been trained to do Bayesian inference. As input, they take a training data set with a variable number of features and observations, and a test data set containing only inputs. In one forward pass, they output predictive distributions over possible target values. PFNs are trained using synthetic datasets that are sampled from a Prior-Data Generating Model (PDGM), with the choice of PDGM being extremely flexible. 
 
-In [PFNs4BO](https://github.com/automl/PFNs4BO), PFNs demonstrated strong performance as surrogate models for Bayesian optimization.
-
-In our (work)[https://github.com/TimShinners/PFNs4MVBO/blob/main/PFNsCanDoMVBO.pdf], PFNs were trained using a set of Gaussian processes that incorporated different categorical kernels (BODi, Cosmopolitan, CoCaBO). These PFNs performed similarly to their respective Gaussian processes, at a fraction of the computational expense. 
+In [PFNs4BO](https://github.com/automl/PFNs4BO), PFNs demonstrated strong performance as surrogate models for Bayesian optimization. In our [work](https://github.com/TimShinners/PFNs4MVBO/blob/main/PFNsCanDoMVBO.pdf), PFNs were trained using a set of Gaussian processes that incorporated different categorical kernels ([BODi](https://arxiv.org/abs/2303.01774), [Casmopolitan](https://arxiv.org/abs/2102.07188), [CoCaBO](https://arxiv.org/abs/1906.08878)). These PFNs performed similarly to their respective Gaussian processes, at a fraction of the computational expense. 
 
 ### Use our models
 
-Below is a quick implementation of a Bayesian optimization loop, using a mixed-variable PFN as the surrogate model. 
+Below is a quick implementation of a Bayesian optimization loop, using the [MCBO](https://arxiv.org/abs/2306.09803) framework, with a mixed-variable PFN as the surrogate model. 
 
 
 ```python
@@ -27,7 +25,7 @@ task_kws = dict(variable_type=['num'] + ['nominal'] * cat_dims,
                             num_dims=[num_dims] + [1] * cat_dims,
                             num_categories=np.random.randint(2, 10, cat_dims).tolist())
 
-# define the task and search space
+# define the task to optimize, and the search space
 task = task_factory(task_name=task_name, **task_kws)
 search_space = task.get_search_space()
 
