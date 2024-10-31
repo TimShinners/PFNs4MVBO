@@ -1,8 +1,26 @@
-# Prior-Data Fitted Networks Can Do Mixed-Variable Bayesian Optimization
+# Prior-Data Fitted Networks Can Do Mixed-Variable Bayesian Optimization (PFNs4MVBO)
 
-PFNs4BO showed that PFNs work good for bayesian optimization. 
+This repository extends the work done in [PFNs4BO](https://github.com/automl/PFNs4BO) by adapting Prior-Data Fitted Networks (PFNs) to handle Bayesian optimization settings that involve both numerical and categorical variables. 
 
-This repo contains much of the code used in my thesis, "Prior-Data Fitted Networks Can Do Mixed-Variable Bayesian Optimization" 
+### Background
+
+PFNs are a type of transformer that have been trained to do Bayesian inference. As input, they take a training data set with a variable number of features and observations, and a test data set containing only inputs. They output predictive distributions over the possible target values. PFNs are trained using synthetic datasets that are sampled from a Prior-Data Generating Model (PDGM), with the choice of PDGM being extremely flexible. 
+
+In [PFNs4BO](https://github.com/automl/PFNs4BO), PFNs demonstrated strong performance as surrogate models for Bayesian optimization.
+
+In our (work)[https://github.com/TimShinners/PFNs4MVBO/blob/main/PFNsCanDoMVBO.pdf], PFNs were trained using a set of Gaussian processes that incorporated different categorical kernels (BODi, Cosmopolitan, CoCaBO). These PFNs performed similarly to their respective Gaussian processes, at a fraction of the computational expense. 
+
+### Use our models
+
+
+
+
+
+
+
+
+
+
 
 **PFNsCanDoMVBO.pdf** is a pdf of the thesis.
 
