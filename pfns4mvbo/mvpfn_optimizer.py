@@ -26,9 +26,8 @@ except:
 class MVPFNOptimizer(OptimizerBase):
     # a class that combines the model, acquisition function,
     # and acq func optimizer to be a full BO algorithm
-    def __init__(self, search_space, pfn_file, acq_func, acq_optim_name, acq_optim_kwargs=None, n_init=1, use_pfn_acq_func=True, device='cpu', dtype=torch.float64, input_constraints=None, tr_id=None, fast=True, **config):
+    def __init__(self, search_space, pfn, acq_func, acq_optim_name, acq_optim_kwargs=None, n_init=1, use_pfn_acq_func=True, device='cpu', dtype=torch.float64, input_constraints=None, tr_id=None, fast=True, **config):
         '''
-        pfn_file: filename for the trained pfn to use as surrogate, should be "asdf.pth"
         search_space: an instance of a search space from mcbo, gives info for features
         pfn_file: filename for the trained pfn to use as surrogate, should be "asdf.pth"
         acq_func: string saying which acquisition function to use, like 'ei'
@@ -46,6 +45,21 @@ class MVPFNOptimizer(OptimizerBase):
         super().__init__(search_space=search_space,
                          input_constraints=None,
                          dtype=dtype)
+
+
+        if pfn.endswith('.pth') or pfn.endswith('.pt'):
+            # pfn is already a filepath 
+            pfn_file = pfn
+        elif pfn.lower() == 'cocabo':
+            pfn_file = 'trained_pfns/pfn_cocabo_51.pth'
+        elif pfn.lower() in ['casmo', 'casmopolitan']:
+            pfn_file = 'trained_pfns/pfn_casmopolitan_16.pth'
+        elif pfn.lower() == 'bodi':
+            pfn_file = 'trained_pfns/pfn_bodi_24.pth'
+        else:
+            raise ValueError("pfn must be a filepath to a pfn, or one of 'cocabo', 'casmo' or 'bodi'")
+
+
 
         if len(re.findall(r'\d+', pfn_file)) > 0:
             self.name = 'MVPFN_'+re.findall(r'\d+', pfn_file)[0]+f',{"pfn" if use_pfn_acq_func else "mcbo"}AcqFunc'
