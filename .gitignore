@@ -3,3 +3,6 @@
 .RData
 .Ruserdata
 .ipynb_checkpoints
+pfns4mvbo/__pycache__
+pfns4mvbo/priors/__pycache__
+__pycache__
