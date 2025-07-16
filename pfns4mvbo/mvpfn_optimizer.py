@@ -54,11 +54,11 @@ class MVPFNOptimizer(OptimizerBase):
             import importlib.resources as pkg_resources
 
             if pfn.lower() == 'cocabo':
-                pfn_name = 'pfn_cocabo_51.pth'
+                pfn_name = 'pfn_cocabo_51'
             elif pfn.lower() in ['casmo', 'casmopolitan']:
-                pfn_name = 'pfn_casmopolitan_16.pth'
+                pfn_name = 'pfn_casmopolitan_16'
             elif pfn.lower() == 'bodi':
-                pfn_name = 'pfn_bodi_24.pth'
+                pfn_name = 'pfn_bodi_24'
             else:
                 raise ValueError("pfn must be a filepath to a pfn, or one of 'cocabo', 'casmo' or 'bodi'")
 
