@@ -26,7 +26,7 @@ except:
 class MVPFNOptimizer(OptimizerBase):
     # a class that combines the model, acquisition function,
     # and acq func optimizer to be a full BO algorithm
-    def __init__(self, search_space, pfn, acq_func, acq_optim_name, acq_optim_kwargs={}, n_init=1, use_pfn_acq_func=True, device='cpu', dtype=torch.float64, input_constraints=None, tr_id=None, fast=True, **config):
+    def __init__(self, search_space, pfn, acq_func, acq_optim_name, pfn_acq_optim_kwargs={}, n_init=1, use_pfn_acq_func=True, device='cpu', dtype=torch.float64, input_constraints=None, tr_id=None, fast=True, **config):
         '''
         search_space: an instance of a search space from mcbo, gives info for features
         pfn_file: filename for the trained pfn to use as surrogate, should be "asdf.pth"
@@ -92,7 +92,7 @@ class MVPFNOptimizer(OptimizerBase):
             self.acq_func = PFNAcqFunc(acq_func)
             self.model_pfn.set_acq_func(acq_func)
         else:
-            # uses normal distributions
+            # uses strict normal distributions via mcbo's implementation
             self.acq_func = acq_factory(acq_func)
 
         self.acq_optim_name = acq_optim_name
@@ -100,8 +100,8 @@ class MVPFNOptimizer(OptimizerBase):
             # when forming a suggestion, we pretend the search_space
             # is fully continuous and optimize through that,
             # rounding the nominal inputs
-            self.acq_optim_kwargs = acq_optim_kwargs
-            self.acq_optimizer = PFNAcqOptimizer(self.model_pfn, self.search_space, self.device, **self.acq_optim_kwargs)
+            self.pfn_acq_optim_kwargs = pfn_acq_optim_kwargs
+            self.acq_optimizer = PFNAcqOptimizer(self.model_pfn, self.search_space, self.device, **self.pfn_acq_optim_kwargs)
         else:
             # fix stupid bug
             try:
