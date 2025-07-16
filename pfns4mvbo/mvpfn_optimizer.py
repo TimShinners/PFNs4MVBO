@@ -22,9 +22,6 @@ except:
     from pfn_acq_func import PFNAcqFunc
     from pfn_acq_optimizer import PFNAcqOptimizer
 
-import importlib.resources as pkg_resources
-from . import trained_models
-
 
 class MVPFNOptimizer(OptimizerBase):
     # a class that combines the model, acquisition function,
@@ -53,14 +50,18 @@ class MVPFNOptimizer(OptimizerBase):
         if pfn.endswith('.pth') or pfn.endswith('.pt'):
             # pfn is already a filepath 
             pfn_file = pfn
-        elif pfn.lower() == 'cocabo':
-            pfn_file = pkg_resources.path(trained_pfns, "pfn_cocabo_51.pth")
-        elif pfn.lower() in ['casmo', 'casmopolitan']:
-            pfn_file = pkg_resources.path(trained_pfns, "pfn_casmopolitan_16.pth")
-        elif pfn.lower() == 'bodi':
-            pfn_file = pkg_resources.path(trained_pfns, "pfn_bodi_24.pth")
         else:
-            raise ValueError("pfn must be a filepath to a pfn, or one of 'cocabo', 'casmo' or 'bodi'")
+            import importlib.resources as pkg_resources
+            from . import trained_models
+
+            elif pfn.lower() == 'cocabo':
+                pfn_file = pkg_resources.path(trained_pfns, "pfn_cocabo_51.pth")
+            elif pfn.lower() in ['casmo', 'casmopolitan']:
+                pfn_file = pkg_resources.path(trained_pfns, "pfn_casmopolitan_16.pth")
+            elif pfn.lower() == 'bodi':
+                pfn_file = pkg_resources.path(trained_pfns, "pfn_bodi_24.pth")
+            else:
+                raise ValueError("pfn must be a filepath to a pfn, or one of 'cocabo', 'casmo' or 'bodi'")
 
 
 
