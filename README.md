@@ -10,7 +10,7 @@ In [PFNs4BO](https://github.com/automl/PFNs4BO), PFNs demonstrated strong perfor
 
 ### Use our models
 
-Below is a quick implementation of a Bayesian optimization loop, using the [MCBO](https://arxiv.org/abs/2306.09803) framework, with a mixed-variable PFN as the surrogate model. 
+Below is a quick implementation of a Bayesian optimization loop, using the [MCBO](https://arxiv.org/abs/2306.09803) framework, with a mixed-variable PFN as the surrogate model. For more details on implementation, see MVBO_demo.ipynb.
 
 
 ```python
@@ -26,7 +26,7 @@ task_kws = dict(variable_type=['num'] + ['nominal'] * cat_dims,
                             num_categories=np.random.randint(2, 10, cat_dims).tolist())
 
 # define the task to optimize, and the search space
-task = task_factory(task_name=task_name, **task_kws)
+task = task_factory(task_name='ackley', **task_kws)
 search_space = task.get_search_space()
 
 
@@ -43,9 +43,7 @@ y_init = task(x_init)
 optimizer.initialize(x_init, y_init)
 
 # Run BO loop
-n_iterations = 100
-
-for i in range(n_iterations):
+for i in range(100):
 
     x = optimizer.suggest()
     y = task(x)
