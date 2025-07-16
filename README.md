@@ -15,7 +15,7 @@ Below is a quick implementation of a Bayesian optimization loop, using the [MCBO
 
 ```python
 from mcbo import task_factory
-from mvpfn_optimizer import MVPFNOptimizer
+from pfns4mvbo import MVPFNOptimizer
 
 
 # Define dimensionality of the task
@@ -33,9 +33,9 @@ search_space = task.get_search_space()
 # define the BO optimizer, which uses a PFN as a surrogate function
 optimizer = MVPFNOptimizer(search_space=search_space,
                            input_constraints=task.input_constraints,
-                           pfn_file='pfn_cocabo_59.pth',
+                           pfn='casmopolitan',
                            acq_func='ei',
-                           acq_optim_name='mab')
+                           acq_optim_name='is')
 
 # initialize the optimizer
 x_init = search_space.sample(n_init)
