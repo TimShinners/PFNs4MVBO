@@ -9,6 +9,7 @@ setup(
         #'torch',
         #'mcbo'
     ],
+    include_package_data=True,
     package_data={
         "pfns4mvbo": ["trained_models/*.pth"],
     },

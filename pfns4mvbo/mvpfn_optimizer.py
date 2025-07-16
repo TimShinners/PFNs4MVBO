@@ -54,14 +54,16 @@ class MVPFNOptimizer(OptimizerBase):
             import importlib.resources as pkg_resources
 
             if pfn.lower() == 'cocabo':
-                pfn_file = pkg_resources.path('pfns4mvbo.trained_pfns', "pfn_cocabo_51.pth")
+                pfn_name = 'pfn_cocabo_51.pth'
             elif pfn.lower() in ['casmo', 'casmopolitan']:
-                pfn_file = pkg_resources.path('pfns4mvbo.trained_pfns', "pfn_casmopolitan_16.pth")
+                pfn_name = 'pfn_casmopolitan_16.pth'
             elif pfn.lower() == 'bodi':
-                pfn_file = pkg_resources.path('pfns4mvbo.trained_pfns', "pfn_bodi_24.pth")
+                pfn_name = 'pfn_bodi_24.pth'
             else:
                 raise ValueError("pfn must be a filepath to a pfn, or one of 'cocabo', 'casmo' or 'bodi'")
 
+            with pkg_resources.path('pfns4mvbo', f'trained_pfns/{pfn_name}.pth') as p:
+                pfn_file = str(p)
 
 
         if len(re.findall(r'\d+', pfn_file)) > 0:
