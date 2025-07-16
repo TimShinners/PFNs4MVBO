@@ -11,7 +11,7 @@ setup(
     ],
     include_package_data=True,
     package_data={
-        "pfns4mvbo": ["trained_models/*.pth"],
+        "pfns4mvbo": ["*.pth"],
     },
     author='Timothy Shinners',
     description='PFNs For Mixed-Variable Bayesian allows for the use of PFNs as a surrogate function in Bayesian optimization methods',

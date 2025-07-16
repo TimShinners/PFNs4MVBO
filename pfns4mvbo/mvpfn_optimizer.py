@@ -62,7 +62,7 @@ class MVPFNOptimizer(OptimizerBase):
             else:
                 raise ValueError("pfn must be a filepath to a pfn, or one of 'cocabo', 'casmo' or 'bodi'")
 
-            with pkg_resources.path('pfns4mvbo', f'trained_pfns/{pfn_name}.pth') as p:
+            with pkg_resources.path('pfns4mvbo', f'{pfn_name}.pth') as p:
                 pfn_file = str(p)
 
 

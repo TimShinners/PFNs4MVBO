@@ -6,4 +6,4 @@ authors = [{ name = "Timothy Shinners" }]
 dependencies = []
 
 [tool.setuptools.package-data]
-"pfns4mvbo" = ["trained_models/*.pth"]
+"pfns4mvbo" = ["*.pth"]
