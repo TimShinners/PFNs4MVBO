@@ -26,7 +26,7 @@ except:
 class MVPFNOptimizer(OptimizerBase):
     # a class that combines the model, acquisition function,
     # and acq func optimizer to be a full BO algorithm
-    def __init__(self, search_space, pfn, acq_func, acq_optim_name, acq_optim_kwargs=None, n_init=1, use_pfn_acq_func=True, device='cpu', dtype=torch.float64, input_constraints=None, tr_id=None, fast=True, **config):
+    def __init__(self, search_space, pfn, acq_func, acq_optim_name, acq_optim_kwargs={}, n_init=1, use_pfn_acq_func=True, device='cpu', dtype=torch.float64, input_constraints=None, tr_id=None, fast=True, **config):
         '''
         search_space: an instance of a search space from mcbo, gives info for features
         pfn_file: filename for the trained pfn to use as surrogate, should be "asdf.pth"
