@@ -1,5 +1,9 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+[project]
+name = "pfns4mvbo"
+version = "0.1.0"
+description = "integrates PFNs into mixed variable bayesian optimization"
+authors = [{ name = "Timothy Shinners" }]
+dependencies = []
+
 [tool.setuptools.package-data]
 "pfns4mvbo" = ["trained_models/*.pth"]
