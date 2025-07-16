@@ -26,6 +26,8 @@ class PFNAcqOptimizer():
         self.pfn_model = pfn_model
 
         self.optim_args = kwargs
+        self.optim_args.setdefault('optimizer', 'adam')
+        self.optim_args.setdefault('parallelize_restarts', True)
 
         self.input_constraints = self.get_input_constraints(self.search_space,
                                                             self.pfn_model.categorical_encoder)
@@ -44,16 +46,6 @@ class PFNAcqOptimizer():
                 print('ordinal', search_space.params[param].is_ordinal)
                 print('permutation', search_space.params[param].is_permutation)
 
-            '''if search_space.params[param].is_nominal:
-                input_constraints.loc[param, 0] = min(search_space.params[param].categories)
-                input_constraints.loc[param, 1] = max(search_space.params[param].categories)
-            elif search_space.params[param].is_cont:
-                input_constraints.loc[param, 0] = search_space.params[param].lb
-                input_constraints.loc[param, 1] = search_space.params[param].ub
-            elif search_space.params[param].is_disc:
-                assert search_space.params[param].param_dict['type'] == 'int'
-                input_constraints.loc[param, 0] = search_space.params[param].lb
-                input_constraints.loc[param, 1] = search_space.params[param].ub'''
             if search_space.params[param].is_nominal:
                 input_constraints[param][0] = min(search_space.params[param].categories)
                 input_constraints[param][1] = max(search_space.params[param].categories)
