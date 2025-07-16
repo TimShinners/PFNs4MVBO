@@ -168,7 +168,7 @@ class MVPFNOptimizer(OptimizerBase):
         self.y = y
 
         self.best_y = self.y.min()
-        self._best_x = self.x[self.y.argmin(), :]
+        self._best_x = self.x[self.y.argmin(), :].unsqueeze(dim=0)
 
         # fit the model
         self.model_pfn.fit(self.x, self.y)
@@ -219,7 +219,7 @@ class MVPFNOptimizer(OptimizerBase):
             x_next = self.acq_optimizer.optimize()
         else:
             x_next = self.acq_optimizer.optimize(
-                x=self._best_x,
+                x=self._best_x.squeeze(dim=0),
                 n_suggestions=1,
                 x_observed=self.x,
                 model=self.model_pfn,
@@ -263,7 +263,7 @@ class MVPFNOptimizer(OptimizerBase):
 
         # update best x and y
         self.best_y = self.y.min()
-        self._best_x = self.x[self.y.argmin(), :]
+        self._best_x = self.x[self.y.argmin(), :].unsqueeze(dim=0)
 
         # fit the model
         self.model_pfn.fit(self.x, self.y)
