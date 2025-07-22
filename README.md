@@ -10,7 +10,45 @@ In [PFNs4BO](https://github.com/automl/PFNs4BO), PFNs demonstrated strong perfor
 
 ### Use our models
 
-Below is a quick implementation of a Bayesian optimization loop, using the [MCBO](https://arxiv.org/abs/2306.09803) framework, with a mixed-variable PFN as the surrogate model. For more details on implementation, see MVBO_demo.ipynb.
+See MVBO_demo.ipynb for example implementations of Bayesian optimization loops. Unfortunately, a lot of the required packages have conflicting dependencies. **As of July 2025**, the following instructions should create an environment such that all the code in the notebook runs cleanly with no errors or warnings. 
+
+Start by cloning the HEBO repository:
+
+```
+git clone https://github.com/huawei-noah/HEBO
+```
+
+Then, navigate to the file HEBO/MCBO/requirements.txt, and delete line 19 `scikit-posthocs @ git+https://github.com/maximtrp/scikit-posthocs.git` (or comment it out with a #)
+
+Then, create a new environment:
+
+```
+conda create --name mvbo_env
+conda activate mvbo_env
+```
+
+Change the directory:
+```
+cd filepath/to/HEBO/MCBO
+```
+
+And install these packages in the following order:
+
+```
+conda install python=3.9
+pip install scikit-posthocs==0.8.0
+pip install -e .
+pip install pfns4bo 
+pip install git+https://github.com/TimShinners/PFNs4MVBO
+conda install jupyter
+pip install scipy==1.13.1
+pip install botorch==0.9.1
+pip install pandas==1.3.5
+```
+
+Then, navigate to the directory with MVBO_demo.ipynb and use `jupyter notebook` to open the notebook and begin.
+
+Below is a snippet of code for a Bayesian optimization loop, using the [MCBO](https://arxiv.org/abs/2306.09803) framework, with a mixed-variable PFN as the surrogate model. For more details on implementation, see MVBO_demo.ipynb.
 
 
 ```python
@@ -51,9 +89,6 @@ for i in range(100):
     optimizer.observe(x, y)
 
 ```
-
-
-
 
 
 
