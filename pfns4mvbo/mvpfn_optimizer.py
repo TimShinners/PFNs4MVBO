@@ -138,7 +138,7 @@ class MVPFNOptimizer(OptimizerBase):
                         out_constr_dims=None,
                         out_upper_constr_vals=0,
                         device=device,
-                         
+
                     )
 
 
@@ -153,8 +153,26 @@ class MVPFNOptimizer(OptimizerBase):
 
         self.tr_id = tr_id
         assert (tr_id == 'basic' and self.acq_optim_name != 'pfn') or tr_id is None
-        self.tr_manager = BoBuilder.get_tr_manager(tr_id=self.tr_id, search_space=search_space, model=self.model_pfn, n_init=n_init,
-                                                   )#**tr_kwargs)
+
+        try:
+            self.tr_manager = BoBuilder.get_tr_manager(
+                tr_id=self.tr_id,
+                search_space=search_space,
+                model=self.model_pfn,
+                n_init=n_init,
+            )#**tr_kwargs)
+        except:
+            # this adds compatibility with current version of mcbo (july 2025)
+            self.tr_manager = BoBuilder.get_tr_manager(
+                tr_id=self.tr_id,
+                search_space=search_space,
+                model=self.model_pfn,
+                n_init=n_init,
+                constr_models=[],
+                obj_dims=None,
+                out_constr_dims=None,
+                out_upper_constr_vals=0
+            )  # **tr_kwargs)
 
     def name(self) -> str:
         name = ""
