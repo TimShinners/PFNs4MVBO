@@ -42,9 +42,18 @@ class MVPFNOptimizer(OptimizerBase):
             'acq_optim_kwargs': default None
             }
         '''
-        super().__init__(search_space=search_space,
-                         input_constraints=None,
-                         dtype=dtype)
+        try:
+            super().__init__(search_space=search_space,
+                             input_constraints=None,
+                             dtype=dtype)
+        except:
+            # adds compatibility with current version of mcbo (july 2025)
+            super().__init__(search_space=search_space,
+                             input_constraints=None,
+                             obj_dims=None,
+                             out_constr_dims=None,
+                             out_upper_constr_vals=None,
+                             dtype=dtype)
 
 
         if pfn.endswith('.pth') or pfn.endswith('.pt'):
