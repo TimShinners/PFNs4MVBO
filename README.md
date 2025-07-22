@@ -10,7 +10,7 @@ In [PFNs4BO](https://github.com/automl/PFNs4BO), PFNs demonstrated strong perfor
 
 ### Use our models
 
-See [MVBO_demo.ipynb](https://github.com/TimShinners/PFNs4MVBO/blob/main/MVBO_demo.ipynb) for example implementations of Bayesian optimization loops. Unfortunately, a lot of the required packages have conflicting dependencies. **As of July 2025**, the following instructions should create an environment such that all the code in the notebook runs cleanly with no errors or warnings. 
+Download [MVBO_demo.ipynb](https://github.com/TimShinners/PFNs4MVBO/blob/main/MVBO_demo.ipynb) to see example implementations of Bayesian optimization loops. Unfortunately, a lot of the required packages have conflicting dependencies. **As of July 2025**, the following instructions should create an environment such that all the code in the notebook runs cleanly with no errors or warnings. 
 
 Start by cloning the HEBO repository:
 
@@ -46,7 +46,7 @@ pip install botorch==0.9.1
 pip install pandas==1.3.5
 ```
 
-Then, navigate to the directory with MVBO_demo.ipynb and use `jupyter notebook` to open the notebook and begin.
+Then, navigate to the directory with [MVBO_demo.ipynb](https://github.com/TimShinners/PFNs4MVBO/blob/main/MVBO_demo.ipynb) and use `jupyter notebook` to open the notebook and begin.
 
 Below is a snippet of code for a Bayesian optimization loop, using the [MCBO](https://arxiv.org/abs/2306.09803) framework, with a mixed-variable PFN as the surrogate model. For more details on implementation, see [MVBO_demo.ipynb](https://github.com/TimShinners/PFNs4MVBO/blob/main/MVBO_demo.ipynb).
 
