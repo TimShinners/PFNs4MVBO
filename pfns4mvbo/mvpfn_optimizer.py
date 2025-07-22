@@ -124,9 +124,23 @@ class MVPFNOptimizer(OptimizerBase):
                                                              input_constraints=input_constraints,
                                                              device=device)
             except:
-                self.acq_optimizer = BoBuilder.get_acq_optim(search_space,
-                                                             acq_optim_name,
-                                                             input_constraints=input_constraints)
+                try:
+                    self.acq_optimizer = BoBuilder.get_acq_optim(search_space,
+                                                                 acq_optim_name,
+                                                                 input_constraints=input_constraints)
+                except:
+                    # add compatibility with current version of mcbo (july 2025)
+                    self.acq_optimizer = BoBuilder.get_acq_optim(
+                        search_space,
+                        acq_optim_name,
+                        input_constraints=input_constraints,
+                        obj_dims=None,
+                        out_constr_dims=None,
+                        out_upper_constr_vals=0,
+                        device=device,
+                         
+                    )
+
 
         if fast:
             # speed up acq optimization
