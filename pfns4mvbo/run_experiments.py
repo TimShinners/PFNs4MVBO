@@ -604,7 +604,7 @@ if __name__ == "__main__":
         prior = surrogate_components[1].lower()
         pfn_number = surrogate_components[2]
 
-        MODEL_FILENAME = f'{directory}/trained_models/pfn_{prior}_{pfn_number}.pth'
+        MODEL_FILENAME = f'{directory}/pfns4mvbo/pfn_{prior}_{pfn_number}.pth'
 
         model_kwargs = {
             'pfn': MODEL_FILENAME,
