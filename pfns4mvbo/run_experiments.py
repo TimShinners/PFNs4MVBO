@@ -464,6 +464,9 @@ def do_optimization_experiment(OptimizerClass,
                 # fix stupid argument issue
                 optimizer = OptimizerClass(search_space=search_space,
                                            input_constraints=task.input_constraints,
+                                           obj_dims=None,
+                                           out_constr_dims=None,
+                                           out_upper_constr_vals=0,
                                            **optimizer_kwargs)
 
             task.restart()
