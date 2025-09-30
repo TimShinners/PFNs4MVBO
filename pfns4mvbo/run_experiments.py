@@ -696,7 +696,11 @@ if __name__ == "__main__":
 
         else:
             # we use mcbo optimizer
-            optimizer_kwargs = {'device': device}
+            optimizer_kwargs = {'device': device,
+                                'obj_dims': None,
+                                'out_constr_dims': None,
+                                'out_upper_constr_vals': 0,
+                                }
 
             results_bo = do_optimization_experiment(BO_ALGOS[opt_id].build_bo, LIST_OF_TASKS, n_init=n_init,
                                                     n_iterations=n_iterations, n_setups=n_setups, seed=seed,
