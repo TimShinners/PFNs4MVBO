@@ -676,7 +676,7 @@ if __name__ == "__main__":
                 tr_id = None
 
             optimizer_kwargs = {
-                'pfn_file': MODEL_FILENAME,
+                'pfn': MODEL_FILENAME,
                 'acq_func': acq_id,
                 'acq_optim_name': acq_optim_id,
                 'tr_id': tr_id,
