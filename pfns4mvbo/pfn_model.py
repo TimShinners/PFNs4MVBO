@@ -13,7 +13,10 @@ class PFNModel(ModelBase):
         super().__init__(search_space=search_space, num_out=num_out, device=device, dtype=dtype, **kwargs)
 
         if isinstance(pfn, str):
-            pfn = torch.load(pfn)
+            try:
+                pfn = torch.load(pfn)
+            except:
+                pfn = torch.load(pfn, weights_only=False)
 
         assert isinstance(pfn, torch.nn.Module), "pfn needs to be filepath (string) or the loaded torch module"
         self.pfn = pfn.to(dtype=self.dtype, device=self.device)
