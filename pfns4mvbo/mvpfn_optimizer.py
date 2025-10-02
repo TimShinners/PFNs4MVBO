@@ -169,7 +169,7 @@ class MVPFNOptimizer(OptimizerBase):
                 model=self.model_pfn,
                 n_init=n_init,
                 constr_models=[],
-                obj_dims=None,
+                obj_dims=[0],
                 out_constr_dims=None,
                 out_upper_constr_vals=0
             )  # **tr_kwargs)
